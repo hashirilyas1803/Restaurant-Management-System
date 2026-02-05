@@ -1,0 +1,15 @@
+0. User Authentication Workflow
+Users are required to log in before accessing any workflow in the system. Authentication is handled as a common workflow and is assumed to be completed before initiating any of the workflows listed below.
+
+1. Table Reservation and Pre-Order Workflow
+Customers can view available tables and seats in real time, reserve a table for a specific time slot, and optionally place a pre-order so that the food is prepared to be ready at the reservation time.
+
+
+
+2. Online Ordering Workflow (Delivery and Takeaway)
+Customers can browse the menu, place orders for delivery or takeaway, make payments, and track the status of their orders.
+
+
+
+3. Catering and Event Booking Workflow
+Customers can request catering services or book the restaurant for events by specifying event details such as date, time, number of guests, and menu preferences, which are then reviewed and confirmed by the restaurant.
