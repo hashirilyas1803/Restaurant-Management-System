@@ -13,3 +13,43 @@ Customers can browse the menu, place orders for delivery or takeaway, make payme
 
 3. Catering and Event Booking Workflow
 Customers can request catering services or book the restaurant for events by specifying event details such as date, time, number of guests, and menu preferences, which are then reviewed and confirmed by the restaurant.
+
+Step-by-Step Description:
+
+Step 1: Access Catering Section
+- Customer logs in and goes to "Catering & Events" page
+- Views available catering packages and sample menus
+
+Step 2: Fill Event Details
+- Customer fills booking form with:
+  * Event date and time
+  * Number of guests
+  * Event type (wedding, corporate, birthday, etc.)
+  * Venue (restaurant or external location)
+
+Step 3: Select Menu
+- Customer browses menu items
+- Selects dishes for the event
+- System shows estimated total cost
+
+Step 4: Submit Request
+- Customer reviews details and submits booking request
+- Receives booking reference number
+
+Step 5: Admin Review
+- Restaurant admin gets notified
+- Reviews the request and checks availability
+- Approves, suggests changes, or rejects
+
+Step 6: Confirmation and Payment
+- Customer gets approval notification
+- Makes payment (advance deposit)
+- Receives final booking confirmation
+
+Key Features:
+- Event booking form with date/time selection
+- Menu customization based on guest count
+- Automatic price calculation
+- Admin approval system (review and approval)
+- Payment integration
+- Email/SMS notifications
