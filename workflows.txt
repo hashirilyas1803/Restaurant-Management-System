@@ -4,10 +4,46 @@ Users are required to log in before accessing any workflow in the system. Authen
 1. Table Reservation and Pre-Order Workflow
 Customers can view available tables and seats in real time, reserve a table for a specific time slot, and optionally place a pre-order so that the food is prepared to be ready at the reservation time.
 
+Step-by-Step Workflow Description:
+    1. The customer opens the table reservation section of the web application and selects a date and time.
+    2. The system displays available tables and seating capacity based on the selected date and time.
+    3. The customer selects their preferred table.
+    4. The customer enters required personal details to confirm the reservation.
+    5. The system provides an option to browse the menu and place a pre-order.
+    6. The customer selects food items and confirms the pre-order.
+    7. The system validates table availability and reservation details.
+    8. Reservation and pre-order information are stored in the database.
+    9. The system updates table availability automatically.
+    10. Restaurant staff are notified of the reservation and pre-order.
+
+Key Features and Functionalities:
+    - Real-time table availability
+    - Advance table reservation
+    - Optional food pre-ordering
+    - Automatic table status updates
 
 
 2. Online Ordering Workflow (Delivery and Takeaway)
 Customers can browse the menu, place orders for delivery or takeaway, make payments, and track the status of their orders.
+
+Step-by-Step Workflow Description:
+1. The customer opens the online ordering section of the application.
+2. The system displays the restaurant menu with item details and prices.
+3. The customer selects menu items and adds them to the cart.
+4. The customer chooses the order type (delivery or takeaway).
+5. The customer enters delivery details if delivery is selected.
+6. The customer proceeds to the payment process.
+7. The system confirms the payment and places the order.
+8. The order is sent to the restaurant for preparation.
+9. The system updates the order status during preparation and fulfillment.
+10. The customer tracks the order until delivery or pickup.
+
+Key Features and Functionalities:
+- Online menu browsing
+- Cart and order management
+- Delivery and takeaway options
+- Online payment processing
+- Order status tracking
 
 
 
