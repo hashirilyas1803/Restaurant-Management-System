@@ -8,8 +8,6 @@ Customers can view available tables and seats in real time, reserve a table for 
 
 2. Online Ordering Workflow (Delivery and Takeaway)
 Customers can browse the menu, place orders for delivery or takeaway, make payments, and track the status of their orders.
-Workflow Specification:
-This workflow describes how customers place online food orders for delivery or takeaway through the system.
 
 Step-by-Step Workflow Description:
 1. The customer opens the online ordering section of the application.
