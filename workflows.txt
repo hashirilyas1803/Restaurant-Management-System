@@ -26,6 +26,25 @@ Key Features and Functionalities:
 2. Online Ordering Workflow (Delivery and Takeaway)
 Customers can browse the menu, place orders for delivery or takeaway, make payments, and track the status of their orders.
 
+Step-by-Step Workflow Description:
+1. The customer opens the online ordering section of the application.
+2. The system displays the restaurant menu with item details and prices.
+3. The customer selects menu items and adds them to the cart.
+4. The customer chooses the order type (delivery or takeaway).
+5. The customer enters delivery details if delivery is selected.
+6. The customer proceeds to the payment process.
+7. The system confirms the payment and places the order.
+8. The order is sent to the restaurant for preparation.
+9. The system updates the order status during preparation and fulfillment.
+10. The customer tracks the order until delivery or pickup.
+
+Key Features and Functionalities:
+- Online menu browsing
+- Cart and order management
+- Delivery and takeaway options
+- Online payment processing
+- Order status tracking
+
 
 
 3. Catering and Event Booking Workflow
