@@ -8,3 +8,82 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+// Models
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  email String @unique
+  password_hash String
+  phone_number String
+  created_at DateTime @default(now())
+  orders Order[]
+  reservations Reservation[]
+  caterings Catering[]
+}
+model Order {
+  id Int @id @default(autoincrement())
+  total Float
+  datetime DateTime @default(now())
+  location String
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  dishes OrderDish[]
+}
+model Table {
+  id Int @id @default(autoincrement())
+  capacity Int
+  status Boolean @default(true)
+  reservations Reservation[]
+}
+model Reservation {
+  id Int @id @default(autoincrement())
+  datetime DateTime
+  userId Int
+  user User @relation(fields:[userId], references: [id])
+  tableId Int
+  table Table @relation(fields:[tableId], references: [id])
+  dishes ReservationDish[]
+}
+model Dish {
+  id Int @id @default(autoincrement())
+  name String
+  price Float
+  cuisine String
+  reservations ReservationDish[]
+  orders OrderDish[]
+  caterings CateringDish[]
+}
+model ReservationDish {
+  id Int @id @default(autoincrement())
+  quantity Int
+  dishId Int
+  dish Dish @relation(fields: [dishId], references: [id])
+  reservationId Int
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+}
+model OrderDish {
+  id Int @id @default(autoincrement())
+  quantity Int
+  dishId Int
+  dish Dish @relation(fields: [dishId], references: [id])
+  orderId Int
+  order Order @relation(fields:[orderId], references:[id])
+}
+model Catering {
+  id Int @id @default(autoincrement())
+  location String
+  datetime DateTime
+  total Float
+  userId Int
+  user User @relation(fields:[userId], references: [id])
+  dishes CateringDish[]
+}
+model CateringDish {
+  id Int @id @default(autoincrement())
+  quantity Int
+  cateringId Int
+  catering Catering @relation(fields: [cateringId], references: [id])
+  dishId Int
+  dish Dish @relation(fields: [dishId], references: [id])
+}
