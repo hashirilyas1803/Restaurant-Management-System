@@ -9,6 +9,27 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Enums for State Management & RBAC
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum CateringStatus {
+  PENDING
+  APPROVED
+  CHANGES_REQUESTED
+  REJECTED
+}
+
 // Models
 model User {
   id Int @id @default(autoincrement())
@@ -16,26 +37,31 @@ model User {
   email String @unique
   password_hash String
   phone_number String
+  role Role @default(CUSTOMER)
   created_at DateTime @default(now())
   orders Order[]
   reservations Reservation[]
   caterings Catering[]
 }
+
 model Order {
   id Int @id @default(autoincrement())
   total Float
   datetime DateTime @default(now())
   location String
+  status OrderStatus @default(PENDING)
   userId Int
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references:[id])
   dishes OrderDish[]
 }
+
 model Table {
   id Int @id @default(autoincrement())
   capacity Int
   status Boolean @default(true)
   reservations Reservation[]
 }
+
 model Reservation {
   id Int @id @default(autoincrement())
   datetime DateTime
@@ -44,7 +70,9 @@ model Reservation {
   tableId Int
   table Table @relation(fields:[tableId], references: [id])
   dishes ReservationDish[]
+  total Float?
 }
+
 model Dish {
   id Int @id @default(autoincrement())
   name String
@@ -54,6 +82,7 @@ model Dish {
   orders OrderDish[]
   caterings CateringDish[]
 }
+
 model ReservationDish {
   id Int @id @default(autoincrement())
   quantity Int
@@ -62,6 +91,7 @@ model ReservationDish {
   reservationId Int
   reservation Reservation @relation(fields: [reservationId], references: [id])
 }
+
 model OrderDish {
   id Int @id @default(autoincrement())
   quantity Int
@@ -70,15 +100,18 @@ model OrderDish {
   orderId Int
   order Order @relation(fields:[orderId], references:[id])
 }
+
 model Catering {
   id Int @id @default(autoincrement())
   location String
   datetime DateTime
   total Float
+  status CateringStatus @default(PENDING)
   userId Int
   user User @relation(fields:[userId], references: [id])
   dishes CateringDish[]
 }
+
 model CateringDish {
   id Int @id @default(autoincrement())
   quantity Int
