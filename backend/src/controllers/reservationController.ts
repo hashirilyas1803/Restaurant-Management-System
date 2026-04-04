@@ -1,29 +1,28 @@
-import { createReservation, getAllReservations, updateReservation, deleteReservation, ReservationData, UpdateReservationData, DishOrder } from "../services/reservationService";
+import { createReservation, getAllReservations, updateReservation, deleteReservation, ReservationData, UpdateReservationData, DishOrder, getReservationById } from "../services/reservationService";
 import { Request, Response } from 'express';
 
 export async function handleCreateReservation(req: Request, res: Response) {
     try {
-        // Create a new data object with the correct data types
+        // Pull the userId directly from the verified token
+        const currentUser = req.user!;
+
         const data: ReservationData = {
-            userId: req.body.userId, 
+            userId: currentUser.userId, 
             tableId: req.body.tableId, 
             datetime: new Date(req.body.datetime)
         };
 
         const orders: DishOrder[] = req.body.preOrders || []; 
 
-        // Create the reservation using the service layer
         const reservation = await createReservation(data, orders);
 
-        // Return the response in case of success
         return res.status(201).json({
             "message": "Reservation created successfully",
             "data": reservation
         });
     }
     catch(error) {
-        // Return an error in case of an exception and log the error
-        console.error("Reservation Creation failed at the service layer! ", error);
+        console.error("Reservation Creation failed: ", error);
         return res.status(500).json({
             "message": "Reservation could not be created!",
             "error": (error as Error).message
@@ -33,18 +32,22 @@ export async function handleCreateReservation(req: Request, res: Response) {
 
 export async function handleGetAllReservations(req: Request, res: Response) {
     try {
-        // Retrieve all reservations using the service layer
-        const reservations = await getAllReservations();
+        const currentUser = req.user!;
+        let reservations = await getAllReservations();
 
-        // Return the response in case of success
+        // If the user is a Customer, filter the results to only show their reservations
+        // Admins will bypass this and see the full list
+        if (currentUser.role === 'CUSTOMER') {
+            reservations = reservations.filter(r => r.user.id === currentUser.userId);
+        }
+
         return res.status(200).json({
             "message": "Reservations retrieved successfully",
             "data": reservations
         });
     }
     catch(error) {
-        // Return an error in case of an exception and log the error
-        console.error("Reservation Retrieval failed at the service layer! ", error);
+        console.error("Reservation Retrieval failed: ", error);
         return res.status(500).json({
             "message": "Reservations could not be retrieved!",
             "error": (error as Error).message
@@ -54,16 +57,21 @@ export async function handleGetAllReservations(req: Request, res: Response) {
 
 export async function handleUpdateReservation(req: Request, res: Response) {
     try {
-        // Get the id from the URL parameters
         const reservationId = Number(req.params.id);
+        const currentUser = req.user!;
 
-        // Get the entire request body
-        const dataForUpdate: UpdateReservationData = req.body;
+        // Perform the ownership check before proceeding
+        const reservation = await getReservationById(reservationId);
+        if (reservation.userId !== currentUser.userId && currentUser.role !== 'ADMIN') {
+            return res.status(403).json({
+                "message": "Access denied",
+                "error": "You do not have permission to update this reservation"
+            });
+        }
         
-        // Call the service with TWO distinct arguments: id and data
-        const updatedReservation = await updateReservation(reservationId, dataForUpdate);
+        // If the check passes, proceed with the update
+        const updatedReservation = await updateReservation(reservationId, req.body);
 
-        // Return the response in case of success
         return res.status(200).json({
             "message": "Reservation updated successfully",
             "data": updatedReservation
@@ -82,13 +90,24 @@ export async function handleUpdateReservation(req: Request, res: Response) {
 
 export async function handleDeleteReservation(req: Request, res: Response) {
     try {
-        // Delete the reservation using the service layer
-        await deleteReservation(Number(req.params.id));
+        const reservationId = Number(req.params.id);
+        const currentUser = req.user!;
 
-        // Return the No Content status code for a successful delete operation
-        res.status(200).json({
+        // Perform the ownership check before proceeding
+        const reservation = await getReservationById(reservationId);
+        if (reservation.userId !== currentUser.userId && currentUser.role !== 'ADMIN') {
+            return res.status(403).json({
+                "message": "Access denied",
+                "error": "You do not have permission to delete this reservation"
+            });
+        }
+
+        // If the check passes, proceed with the deletion
+        await deleteReservation(reservationId);
+
+        return res.status(200).json({
             "message": "Reservation deleted successfully",
-            "data": { id: Number(req.params.id) }
+            "data": { id: reservationId }
         });
     }
     catch(error) {
