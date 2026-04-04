@@ -1,11 +1,14 @@
 import express from 'express';
-import prisma from './config/db';
+import reservationRoutes from './routes/reservationRoutes';
 
 // Create the express app
 const app = express();
 
 // Parse incoming JSON payloads
 app.use(express.json());
+
+// Use the reservation routes for any request to /api/reservations
+app.use('/api/reservations', reservationRoutes);
 
 // Set the app to listen on port 3000
 app.listen(3000, () => {
