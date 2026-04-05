@@ -130,7 +130,9 @@ Protected routes require the `Authorization` header formatted as: `Bearer <token
 *   **PUT** `/api/orders/:id` - Modify an order. Protected (Owner/Admin, only if PENDING).
 *   **PATCH** `/api/orders/:id/status` - Transition fulfillment status. Protected (Admin only).
 *   **DELETE** `/api/orders/:id` - Cancel order. Protected (Owner/Admin).
+
 **Logic Note:** Implements **Status Transition Guards**. Orders follow a strict fulfillment lifecycle (PENDING -> PREPARING -> OUT_FOR_DELIVERY -> DELIVERED) and cannot move backward or be edited once preparation begins.
+
 
 **Expected Request Format (POST):**
 ```json
