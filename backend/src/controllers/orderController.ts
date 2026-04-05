@@ -4,29 +4,53 @@ import {
     getOrderById, 
     getAllOrders, 
     updateOrderStatus, 
-    deleteOrder 
+    deleteOrder, 
+    updateOrder
 } from '../services/orderService';
 
 export async function handleCreateOrder(req: Request, res: Response) {
     try {
-        // Retrieve the authenticated user ID from the token
         const currentUser = req.user!;
-        const items = req.body.items || [];
-
-        // Create the order with the location and dish items provided
+        
+        // Pass complete business data including Order Type and Payment Method
         const order = await createOrder(
-            { userId: currentUser.userId, location: req.body.location },
-            items
+            { 
+                userId: currentUser.userId, 
+                location: req.body.location,
+                // DELIVERY or TAKEAWAY
+                type: req.body.type,
+                // CASH or ONLINE
+                paymentMethod: req.body.paymentMethod
+            },
+            req.body.items || []
         );
 
-        return res.status(201).json({
-            "message": "Order placed successfully",
-            "data": order
+        return res.status(201).json({ "message": "Order placed successfully", "data": order });
+    } catch (error) {
+        return res.status(500).json({ "message": "Order failed", "error": (error as Error).message });
+    }
+}
+
+export async function handleUpdateOrder(req: Request, res: Response) {
+    try {
+        const orderId = Number(req.params.id);
+        const currentUser = req.user!;
+
+        // Authorization and Status Gate check are handled inside the service and controller
+        const order = await getOrderById(orderId);
+        if (order.userId !== currentUser.userId && currentUser.role !== 'ADMIN') {
+            return res.status(403).json({ "message": "Access denied" });
+        }
+
+        const updatedOrder = await updateOrder(orderId, req.body, req.body.items);
+
+        return res.status(200).json({
+            "message": "Order updated successfully",
+            "data": updatedOrder
         });
     } catch (error) {
-        console.error("Order Creation failed: ", error);
-        return res.status(500).json({
-            "message": "Order could not be placed!",
+        return res.status(400).json({
+            "message": "Update failed",
             "error": (error as Error).message
         });
     }

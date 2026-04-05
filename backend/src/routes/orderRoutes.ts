@@ -4,7 +4,8 @@ import {
     handleGetOrder, 
     handleGetAllOrders, 
     handleUpdateOrderStatus, 
-    handleDeleteOrder 
+    handleDeleteOrder, 
+    handleUpdateOrder
 } from '../controllers/orderController';
 import { authenticate, requireAdmin, requireCustomer } from '../middlewares/authMiddleware';
 
@@ -15,6 +16,9 @@ router.get('/', authenticate, handleGetAllOrders);
 
 // Place a new online order (Customer only)
 router.post('/', authenticate, requireCustomer, handleCreateOrder);
+
+// Update order only if it is still PENDING
+router.put('/:id', authenticate, handleUpdateOrder);
 
 // Retrieve a specific order by ID
 router.get('/:id', authenticate, handleGetOrder);
