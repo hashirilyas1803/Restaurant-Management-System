@@ -7,17 +7,13 @@ const prisma = new PrismaClient();
 jest.setTimeout(30000);
 
 beforeAll(async () => {
-    // Delete data in order of dependency (child tables first)
-    await prisma.blacklistedToken.deleteMany();
-    await prisma.reservationDish.deleteMany();
-    await prisma.orderDish.deleteMany();
-    await prisma.cateringDish.deleteMany();
-    await prisma.reservation.deleteMany();
-    await prisma.order.deleteMany();
-    await prisma.catering.deleteMany();
-    await prisma.table.deleteMany();
-    await prisma.dish.deleteMany();
-    await prisma.user.deleteMany();
+    // Clean and Reset all tables using Raw SQL
+    const tables = ['BlacklistedToken', 'ReservationDish', 'OrderDish', 'CateringDish', 'Reservation', 'Order', 'Catering', 'Table', 'Dish', 'User'];
+    
+    for (const table of tables) {
+        // Delete data AND reset the auto-increment counter to 1
+        await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE;`);
+    }
 
     // Add Fresh Test Data
     const customerPassword = await bcrypt.hash('customer123', 10);
