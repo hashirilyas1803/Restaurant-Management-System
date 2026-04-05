@@ -1,7 +1,6 @@
-import { Prisma } from "@prisma/client";
 import prisma from "../config/db";
+import { Prisma } from '@prisma/client';
 
-// Interfaces for data transfer
 export interface ReservationData {
     userId: number;
     tableId: number;
@@ -23,20 +22,15 @@ export async function createReservation(data: ReservationData, orders: DishOrder
     try {
         let calculatedTotal = 0;
 
-        // Calculate the total securely by fetching actual prices from the database
+        // Fetch dish prices from the database to ensure the total is calculated securely
         if (orders && orders.length > 0) {
-            // Extract all dish IDs from the incoming order
             const dishIds = orders.map(order => order.dishId);
-            
-            // Fetch those specific dishes from the database
             const dishes = await prisma.dish.findMany({
                 where: { id: { in: dishIds } }
             });
 
-            // Create a quick lookup map for prices: { 1: 15.99, 2: 9.50 }
             const priceMap = new Map(dishes.map(dish => [dish.id, dish.price]));
 
-            // Calculate the total based on the quantity requested and the database price
             for (const order of orders) {
                 const price = priceMap.get(order.dishId);
                 if (price === undefined) {
@@ -46,14 +40,16 @@ export async function createReservation(data: ReservationData, orders: DishOrder
             }
         }
 
-        // Create the reservation and any associated pre-ordered dishes
-        const reservation = await prisma.reservation.create({
+        // Round the total to two decimal places to prevent floating point inaccuracies
+        const roundedTotal = Math.round(calculatedTotal * 100) / 100;
+
+        // Create the reservation and link pre-ordered dishes in a single database transaction
+        return await prisma.reservation.create({
             data: {
                 userId: data.userId,
                 tableId: data.tableId,
                 datetime: data.datetime,
-                total: calculatedTotal > 0 ? calculatedTotal : null,
-                // Create ReservationDish entries
+                total: roundedTotal > 0 ? roundedTotal : null,
                 dishes: {
                     create: orders.map((item) => ({
                         quantity: item.quantity,
@@ -63,7 +59,6 @@ export async function createReservation(data: ReservationData, orders: DishOrder
                     }))
                 }
             },
-            // Ensure the response includes the nested dishes
             include: {
                 dishes: {
                     include: {
@@ -72,8 +67,6 @@ export async function createReservation(data: ReservationData, orders: DishOrder
                 }
             }
         });
-
-        return reservation;
     }
     catch(error) {
         console.error("Error in createReservation service:", error);
@@ -83,11 +76,12 @@ export async function createReservation(data: ReservationData, orders: DishOrder
 
 export async function getAllReservations() {
     try {
-        // Retrieve all reservations with selective fields to avoid exposing sensitive data
-        const reservations = await prisma.reservation.findMany({
+        // Retrieve all reservations while omitting sensitive user data like password hashes
+        return await prisma.reservation.findMany({
             select: {
                 id: true,
                 datetime: true,
+                userId: true,
                 user: {
                     select: {
                         id: true,
@@ -116,7 +110,6 @@ export async function getAllReservations() {
                 total: true
             }
         });
-        return reservations;
     }
     catch(error) {
         console.error("Error while fetching reservations: ", error);
@@ -126,9 +119,9 @@ export async function getAllReservations() {
 
 export async function getReservationById(id: number) {
     try {
+        // Fetch a specific reservation with secure user data selection for ownership verification
         const reservation = await prisma.reservation.findUnique({
             where: { id },
-            // Use the same detailed select as getAllReservations
             select: {
                 id: true,
                 datetime: true,
@@ -147,26 +140,23 @@ export async function getReservationById(id: number) {
         return reservation;
     } catch(error) {
         console.error(`Error while fetching reservation with id ${id}:`, error);
-        throw new Error('Database failed to retrieve reservation.');
+        throw new Error((error as Error).message || 'Database failed to retrieve reservation.');
     }
 }
-
 
 export async function updateReservation(id: number, data: UpdateReservationData) {
     try {
         const dataToUpdate: Prisma.ReservationUpdateInput = {};
 
-        // Updating a relationship
         if (data.tableId !== undefined) {
             dataToUpdate.table = { connect: { id: data.tableId } };
         }
 
-        // Updating the datetime
         if (data.datetime !== undefined) {
             dataToUpdate.datetime = new Date(data.datetime);
         }
 
-        // Calculate the new total
+        // Recalculate totals and refresh the bridge table if the pre-order list is modified
         if (data.preOrders !== undefined) {
             let calculatedTotal = 0;
 
@@ -184,11 +174,9 @@ export async function updateReservation(id: number, data: UpdateReservationData)
                 }
             }
 
-            // Rounding and error check
             const roundedTotal = Math.round(calculatedTotal * 100) / 100;
             dataToUpdate.total = roundedTotal > 0 ? roundedTotal : null;
 
-            // Updating the dishes relationship
             dataToUpdate.dishes = {
                 deleteMany: {}, 
                 create: data.preOrders.map((item) => ({
@@ -202,7 +190,10 @@ export async function updateReservation(id: number, data: UpdateReservationData)
             where: { id: id },
             data: dataToUpdate,
             include: {
-                dishes: { include: { dish: true } }
+                dishes: { 
+                    orderBy: { id: 'asc' },
+                    include: { dish: true } 
+                }
             }
         });
     }
@@ -214,7 +205,7 @@ export async function updateReservation(id: number, data: UpdateReservationData)
 
 export async function deleteReservation(id: number) {
     try {
-        // Using deleteMany on the join table first to handle cascading deletes
+        // Remove associated pre-orders before deleting the parent reservation record
         await prisma.reservationDish.deleteMany({
             where: { reservationId: id }
         });

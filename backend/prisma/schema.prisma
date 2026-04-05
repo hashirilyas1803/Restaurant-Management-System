@@ -30,6 +30,17 @@ enum CateringStatus {
   REJECTED
 }
 
+// Enums for specialized order handling
+enum OrderType {
+  DELIVERY
+  TAKEAWAY
+}
+
+enum PaymentMethod {
+  CASH
+  ONLINE
+}
+
 // Models
 model User {
   id Int @id @default(autoincrement())
@@ -49,6 +60,8 @@ model Order {
   total Float
   datetime DateTime @default(now())
   location String
+  type OrderType @default(DELIVERY)
+  paymentMethod PaymentMethod @default(CASH)
   status OrderStatus @default(PENDING)
   userId Int
   user User @relation(fields: [userId], references:[id])
@@ -73,11 +86,13 @@ model Reservation {
   total Float?
 }
 
+
 model Dish {
   id Int @id @default(autoincrement())
   name String
   price Float
   cuisine String
+  category String @default("Main Course") // e.g., Starters, Mains, Desserts
   reservations ReservationDish[]
   orders OrderDish[]
   caterings CateringDish[]
@@ -103,6 +118,8 @@ model OrderDish {
 
 model Catering {
   id Int @id @default(autoincrement())
+  eventName String
+  guestCount Int
   location String
   datetime DateTime
   total Float
