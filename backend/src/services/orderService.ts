@@ -135,15 +135,42 @@ export async function updateOrder(id: number, data: any, items?: DishOrder[]) {
     }
 }
 
-export async function updateOrderStatus(id: number, status: any) {
+export async function updateOrderStatus(id: number, nextStatus: any) {
     try {
-        // Allow administrative updates to fulfillment status codes
+        const order = await prisma.order.findUnique({ where: { id } });
+        if (!order) throw new Error("Order not found.");
+
+        // Define valid forward-moving transitions to enforce business logic and prevent backwards state corruption
+        const validTransitions: Record<string, string[]> = {
+            // Start/Default state
+            PENDING: ['PREPARING', 'CANCELLED'],
+
+            // Order processing/transit states
+            PREPARING: ['OUT_FOR_DELIVERY', 'CANCELLED'],
+            OUT_FOR_DELIVERY: ['DELIVERED', 'CANCELLED'],
+
+            // Terminal states
+            DELIVERED: [],
+            CANCELLED: []
+        };
+
+         const currentStatus = order.status;
+        
+        // Use the null-coalescing operator to provide an empty array if the status is not mapped
+        const allowedNextStates = validTransitions[currentStatus] ?? [];
+
+        // Validate the transition against the defined fulfillment lifecycle
+        if (!allowedNextStates.includes(nextStatus)) {
+            throw new Error(`Invalid status transition from ${currentStatus} to ${nextStatus}.`);
+        }
+
         return await prisma.order.update({
             where: { id },
-            data: { status }
+            data: { status: nextStatus }
         });
     } catch (error) {
-        throw new Error("Failed to update order status.");
+        console.error(`Status transition error for Order ${id}:`, error);
+        throw new Error((error as Error).message || "Failed to update order status.");
     }
 }
 
