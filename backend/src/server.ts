@@ -3,6 +3,7 @@ import cors from 'cors';
 import reservationRoutes from './routes/reservationRoutes';
 import authRoutes from './routes/authRoutes';
 import orderRoutes from './routes/orderRoutes';
+import cateringRoutes from './routes/cateringRoutes';
 
 // Create the express app
 const app = express();
@@ -21,6 +22,9 @@ app.use('/api/reservations', reservationRoutes);
 
 // Mount the order routes
 app.use('/api/orders', orderRoutes);
+
+// Mount the catering routes
+app.use('/api/caterings', cateringRoutes)
 
 // Set the app to listen on port 3000
 app.listen(3000, () => {
