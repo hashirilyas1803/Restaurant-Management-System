@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import reservationRoutes from './routes/reservationRoutes';
 import authRoutes from './routes/authRoutes';
 import orderRoutes from './routes/orderRoutes';
@@ -7,7 +8,7 @@ import orderRoutes from './routes/orderRoutes';
 const app = express();
 
 // Enable CORS
-// app.use(Cors);
+app.use(cors());
 
 // Parse incoming JSON payloads
 app.use(express.json());
