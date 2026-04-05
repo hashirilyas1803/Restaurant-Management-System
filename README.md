@@ -9,7 +9,7 @@ The backend API is fully implemented with Node.js, Express, PostgreSQL, and Pris
 
 ## Team Members
 * [Muhammad Hashir Ilyas (26972)] - [muhammadhashir.ilyas@gmail.com]
-*[Zain Sharjeel (26922)] - [zain.sharjil@gmail.com]
+* [Zain Sharjeel (26922)] - [zain.sharjil@gmail.com]
 * [Ibrahim Iqbal (27085)] -[ibrahimiqbal2002@yahoo.com]
 
 ## Workflows Implemented
