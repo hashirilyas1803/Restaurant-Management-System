@@ -31,7 +31,7 @@ export async function createOrder(data: OrderData, items: DishOrder[]) {
         const roundedTotal = Math.round(calculatedTotal * 100) / 100;
 
         // Persist order with rounded totals and specific fulfillment type/payment method
-        return await prisma.order.create({
+        const order = await prisma.order.create({
             data: {
                 userId: data.userId,
                 location: data.location,
@@ -47,6 +47,12 @@ export async function createOrder(data: OrderData, items: DishOrder[]) {
             },
             include: { dishes: { include: { dish: true } } }
         });
+
+        // Simulate the notification system
+        console.log(`[MOCK SERVICE] Sending SMS to User ${data.userId}: Your order #${order.id} is confirmed.`);
+        if (data.paymentMethod === 'ONLINE') console.log(`[MOCK GATEWAY] Stripe Payment Processed: $${roundedTotal}`);
+
+        return order;
     } catch (error) {
         console.error("Error in createOrder service:", error);
         throw new Error((error as Error).message);

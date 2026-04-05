@@ -22,7 +22,7 @@ export async function requestCatering(data: CateringRequest, menuItems: number[]
         const roundedTotal = Math.round(calculatedTotal * 100) / 100;
 
         // Store catering request and set initial portions in the bridge table to match guest count
-        return await prisma.catering.create({
+        const catering = await prisma.catering.create({
             data: {
                 userId: data.userId,
                 eventName: data.eventName,
@@ -39,6 +39,14 @@ export async function requestCatering(data: CateringRequest, menuItems: number[]
             },
             include: { dishes: { include: { dish: true } } }
         });
+
+        // Simulate the notification system
+        console.log(`[MOCK SERVICE] Notifying Admin of new Catering Request: ${data.eventName}`);
+        
+        const referenceNumber = `CAT-${catering.id}-${Math.floor(Math.random() * 1000)}`;
+        console.log(`[MOCK SERVICE] Generated Reference Number: ${referenceNumber}`);
+
+        return catering;
     } catch (error) {
         console.error("Error in requestCatering service:", error);
         throw new Error((error as Error).message);
@@ -47,7 +55,7 @@ export async function requestCatering(data: CateringRequest, menuItems: number[]
 
 export async function getAllCaterings() {
     try {
-        // Retrieve catering events with sanitized user profile summaries
+        // Retrieve catering events
         return await prisma.catering.findMany({
             include: { 
                 user: { select: { id: true, name: true, email: true, phone_number: true } }, 
@@ -62,16 +70,16 @@ export async function getAllCaterings() {
 
 export async function getCateringById(id: number) {
     try {
-        // Individual catering detail lookup with secure user attribute selection
-        const request = await prisma.catering.findUnique({
+        // Fetch the booking
+        const booking = await prisma.catering.findUnique({
             where: { id },
             include: { 
                 user: { select: { id: true, name: true, email: true, phone_number: true } },
                 dishes: { include: { dish: true } } 
             }
         });
-        if (!request) throw new Error("Catering request not found");
-        return request;
+        if (!booking) throw new Error("Catering request not found");
+        return booking;
     } catch (error) {
         throw new Error((error as Error).message);
     }
@@ -126,8 +134,8 @@ export async function updateCatering(id: number, data: any) {
 
 export async function updateCateringStatus(id: number, nextStatus: any) {
     try {
-        const request = await prisma.catering.findUnique({ where: { id } });
-        if (!request) throw new Error("Catering request not found.");
+        const booking = await prisma.catering.findUnique({ where: { id } });
+        if (!booking) throw new Error("Catering request not found.");
 
         // Define valid transitions for the event booking lifecycle to ensure administrative consistency
         const validTransitions: Record<string, string[]> = {
@@ -144,7 +152,7 @@ export async function updateCateringStatus(id: number, nextStatus: any) {
             REJECTED: []
         };
 
-        const currentStatus = request.status;
+        const currentStatus = booking.status;
 
         // Use the null-coalescing operator to provide an empty array if the status is not mapped
         const allowedNextStates = validTransitions[currentStatus] ?? [];
@@ -174,7 +182,7 @@ export async function deleteCatering(id: number) {
             throw new Error("Cannot delete catering once it has moved past PENDING status.");
         }
         
-        // Explicitly clear bridging table relations before deleting the parent record
+        // Clear bridging table relations before deleting the parent record
         await prisma.cateringDish.deleteMany({ where: { cateringId: id } });
         return await prisma.catering.delete({ where: { id } });
     } catch (error) {

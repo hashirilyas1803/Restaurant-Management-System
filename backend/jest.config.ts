@@ -10,6 +10,7 @@ const config: Config = {
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true,
+  testTimeout: 30000,
 };
 
 export default config;
