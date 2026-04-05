@@ -39,7 +39,7 @@ JWT_SECRET="your_secure_random_string_here"
     ```
 2.  Run migrations to create the database schema:
     ```bash
-    npx prisma migrate dev --name init
+    npx prisma migrate dev
     ```
 3.  Seed the database with initial test data (Users, Tables, Dishes):
     ```bash
@@ -56,63 +56,102 @@ The API will be accessible at `http://localhost:3000`.
 ---
 
 ## API Documentation
+All endpoints return a consistent JSON envelope: `{ "message": string, "data": object | array | null }`. 
+Protected routes require the `Authorization` header formatted as: `Bearer <token>`.
 
 ### 0. Authentication Workflow
-All protected routes require a Bearer Token in the `Authorization` header.
-
-*   **POST** `/api/auth/register` - Register a new user and receive an auto-login token.
+*   **POST** `/api/auth/register` - Register a new user.
 *   **POST** `/api/auth/login` - Authenticate and receive a JWT.
-*   **POST** `/api/auth/logout` - Invalidate the current session token (server-side blacklist).
-*   **GET** `/api/auth/:id` - Retrieve user profile (Owner or Admin only).
+*   **POST** `/api/auth/logout` - Invalidate the current session token (server-side blacklist). Protected.
+*   **GET** `/api/auth/:id` - Retrieve user profile. Protected (Owner/Admin).
 
-**Example Login Request:**
+**Expected Request Format (Register):**
 ```json
 {
-  "email": "customer@example.com",
-  "password": "password123"
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "secure123",
+  "phone_number": "03001234567"
+}
+```
+**Example Response (Login/Register):**
+```json
+{
+  "message": "User logged in successfully",
+  "data": {
+    "user": { "id": 1, "name": "Jane Doe", "email": "jane@example.com", "role": "CUSTOMER" },
+    "token": "eyJhbGciOiJIUzI1NiIs..."
+  }
 }
 ```
 
 ---
 
 ### 1. Table Reservation & Pre-Order Workflow
-Allows customers to book tables and optionally pre-order meals.
+*   **GET** `/api/reservations` - List reservations. Protected (Admin sees all; Customer sees their own).
+*   **POST** `/api/reservations` - Create a reservation. Protected (Customer).
+*   **PUT** `/api/reservations/:id` - Update details/pre-orders. Protected (Owner/Admin).
+*   **DELETE** `/api/reservations/:id` - Cancel reservation. Protected (Owner/Admin).
 
-*   **GET** `/api/reservations` - List reservations (Admin sees all; Customer sees their own).
-*   **POST** `/api/reservations` - Create a new reservation with optional pre-ordered dishes.
-*   **PUT** `/api/reservations/:id` - Update reservation details or pre-orders (Owner or Admin only).
-*   **DELETE** `/api/reservations/:id` - Cancel a reservation (Owner or Admin only).
-
-**Example Create Reservation Payload:**
+**Expected Request Format (POST / PUT):**
 ```json
 {
   "tableId": 1,
   "datetime": "2026-04-10T19:00:00.000Z",
-  "preOrders": [
+  "preOrders":[
     { "dishId": 2, "quantity": 2 }
   ]
+}
+```
+**Example Response (POST):**
+```json
+{
+  "message": "Reservation created successfully",
+  "data": {
+    "id": 1,
+    "userId": 2,
+    "tableId": 1,
+    "datetime": "2026-04-10T19:00:00.000Z",
+    "total": 45.99,
+    "dishes": [...]
+  }
 }
 ```
 
 ---
 
 ### 2. Online Ordering Workflow (Delivery & Takeaway)
-Handles the full lifecycle of a food delivery or takeaway order.
+*   **GET** `/api/orders` - View order history. Protected (Owner/Admin).
+*   **POST** `/api/orders` - Place a new order. Protected (Customer).
+*   **PUT** `/api/orders/:id` - Modify an order. Protected (Owner/Admin, only if PENDING).
+*   **PATCH** `/api/orders/:id/status` - Transition fulfillment status. Protected (Admin only).
+*   **DELETE** `/api/orders/:id` - Cancel order. Protected (Owner/Admin).
 
-*   **GET** `/api/orders` - View order history (Filtered by ownership).
-*   **POST** `/api/orders` - Place a new order with location, type, and payment method.
-*   **PUT** `/api/orders/:id` - Modify an order (Only permitted if status is PENDING).
-*   **PATCH** `/api/orders/:id/status` - Update the status of the order preparation and delivery (Admin only).
-*   **DELETE** `/api/orders/:id` - Cancel an order.
-
-**Example Response Envelope:**
+**Expected Request Format (POST):**
 ```json
 {
-  "message": "Order placed successfully",
+  "location": "123 Main Street",
+  "type": "DELIVERY",
+  "paymentMethod": "ONLINE",
+  "items":[
+    { "dishId": 1, "quantity": 1 }
+  ]
+}
+```
+**Expected Request Format (PATCH Status):**
+```json
+{
+  "status": "PREPARING"
+}
+```
+**Example Response:**
+```json
+{
+  "message": "Order status updated successfully",
   "data": {
     "id": 10,
-    "total": 45.99,
-    "status": "PENDING",
+    "total": 15.99,
+    "status": "PREPARING",
     "type": "DELIVERY"
   }
 }
@@ -121,20 +160,59 @@ Handles the full lifecycle of a food delivery or takeaway order.
 ---
 
 ### 3. Catering & Event Booking Workflow
-Specific logic for high-volume event bookings with per-head pricing.
+*   **GET** `/api/catering` - List all event bookings. Protected (Owner/Admin).
+*   **POST** `/api/catering` - Submit event request. Protected (Customer).
+*   **PUT** `/api/catering/:id` - Update details/guest count. Protected (Owner/Admin).
+*   **PATCH** `/api/catering/:id/status` - Approve/Reject booking. Protected (Admin only).
+*   **DELETE** `/api/catering/:id` - Remove booking. Protected (Owner/Admin).
 
-*   **GET** `/api/catering` - List all event bookings.
-*   **POST** `/api/catering` - Submit a new event request with guest count and menu selection.
-*   **PUT** `/api/catering/:id` - Update event details or guest count.
-*   **PATCH** `/api/catering/:id/status` - Admin review: Approve or Reject a booking.
-*   **DELETE** `/api/catering/:id` - Remove an event booking.
-
-**Business Logic Note:** Total price is automatically calculated as `(Sum of selected Menu Item prices) * guestCount`.
+**Expected Request Format (POST):**
+```json
+{
+  "eventName": "Annual Gala",
+  "guestCount": 100,
+  "location": "Grand Ballroom",
+  "datetime": "2026-05-20T19:00:00.000Z",
+  "menuItemIds": [1, 3, 5]
+}
+```
+**Example Response:**
+```json
+{
+  "message": "Catering request submitted successfully",
+  "data": {
+    "id": 5,
+    "eventName": "Annual Gala",
+    "guestCount": 100,
+    "total": 4500.00,
+    "status": "PENDING"
+  }
+}
+```
 
 ---
 
-### 4. Menu Management (Admin)
-*   **GET** `/api/dishes` - Browse the menu (Public).
-*   **POST** `/api/dishes` - Add new dish with category (Admin only).
-*   **PUT** `/api/dishes/:id` - Edit dish price or details (Admin only).
-*   **DELETE** `/api/dishes/:id` - Remove dish from menu (Admin only).
+### 4. Menu Management (Admin API)
+*   **GET** `/api/dishes` - Browse the menu. Public.
+*   **POST** `/api/dishes` - Add new dish. Protected (Admin only).
+*   **PUT** `/api/dishes/:id` - Edit dish price/details. Protected (Admin only).
+*   **DELETE** `/api/dishes/:id` - Remove dish. Protected (Admin only).
+
+**Expected Request Format (POST / PUT):**
+```json
+{
+  "name": "Truffle Pasta",
+  "price": 24.50,
+  "cuisine": "Italian",
+  "category": "Mains"
+}
+```
+**Example Response:**
+```json
+{
+  "message": "Menu retrieved successfully",
+  "data":[
+    { "id": 1, "name": "Truffle Pasta", "price": 24.50, "category": "Mains" }
+  ]
+}
+```
