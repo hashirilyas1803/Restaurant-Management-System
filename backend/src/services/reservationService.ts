@@ -125,7 +125,7 @@ export async function getReservationById(id: number) {
             select: {
                 id: true,
                 datetime: true,
-                userId: true,
+                userId:true,
                 user: { select: { id: true, name: true, email: true, phone_number: true } },
                 table: { select: { id: true, capacity: true } },
                 dishes: { select: { dish: { select: { name: true, price: true } }, quantity: true } },

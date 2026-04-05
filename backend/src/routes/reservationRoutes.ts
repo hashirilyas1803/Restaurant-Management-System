@@ -5,19 +5,20 @@ import {
     handleUpdateReservation, 
     handleDeleteReservation 
 } from '../controllers/reservationController';
+import { authenticate, requireAdmin, requireCustomer } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-// Route to get all reservations
-router.get('/', handleGetAllReservations);
+// RBAC: Only logged-in Customers can create a reservation
+router.post('/', authenticate, requireCustomer, handleCreateReservation);
 
-// Route to create a new reservation
-router.post('/', handleCreateReservation);
+// A logged-in user can update their own reservation. An Admin can update ANY reservation.
+router.put('/:id', authenticate, handleUpdateReservation);
 
-// Route to update an existing reservation by ID
-router.put('/:id', handleUpdateReservation);
+// A logged-in user can view their own reservation. An Admin can view ANY reservation.
+router.get('/', authenticate, handleGetAllReservations);
 
-// Route to delete a reservation by ID
-router.delete('/:id', handleDeleteReservation);
+// A logged-in user can delete their own reservation. An Admin can delete ANY reservation.
+router.delete('/:id', authenticate, handleDeleteReservation);
 
 export default router;
