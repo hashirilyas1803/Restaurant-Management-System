@@ -20,6 +20,25 @@ export interface DishOrder {
 
 export async function createReservation(data: ReservationData, orders: DishOrder[]) {
     try {
+        // 1 hour in milliseconds
+        const reservationWindow = 60 * 60 * 1000;
+        const bufferStart = new Date(data.datetime.getTime() - reservationWindow);
+        const bufferEnd = new Date(data.datetime.getTime() + reservationWindow);
+
+        // Check if any reservation exists for this table within the 2-hour window
+        const conflict = await prisma.reservation.findFirst({
+            where: {
+                tableId: data.tableId,
+                datetime: {
+                    gte: bufferStart,
+                    lte: bufferEnd
+                }
+            }
+        });
+
+        if (conflict) {
+            throw new Error(`Table ${data.tableId} is already occupied during this time slot (Conflict with Reservation #${conflict.id}).`);
+        }
         let calculatedTotal = 0;
 
         // Fetch dish prices from the database to ensure the total is calculated securely
@@ -146,6 +165,38 @@ export async function getReservationById(id: number) {
 
 export async function updateReservation(id: number, data: UpdateReservationData) {
     try {
+        // Fetch current reservation to get existing values for the collision check
+        const current = await prisma.reservation.findUnique({ where: { id } });
+        if (!current) throw new Error("Reservation not found.");
+
+        // Use new data if provided, otherwise fallback to existing
+        const effectiveTableId = data.tableId ?? current.tableId;
+        const effectiveDatetime = data.datetime ? new Date(data.datetime) : current.datetime;
+
+        // Only run the collision check if table or time is actually changing
+        if (data.tableId !== undefined || data.datetime !== undefined) {
+            // 1 hour in milliseconds
+            const reservationWindow = 60 * 60 * 1000;
+            const bufferStart = new Date(effectiveDatetime.getTime() - reservationWindow);
+            const bufferEnd = new Date(effectiveDatetime.getTime() + reservationWindow);
+
+            const conflict = await prisma.reservation.findFirst({
+                where: {
+                    tableId: effectiveTableId,
+                    // Exclude the current reservation itself
+                    id: { not: id },
+                    datetime: {
+                        gte: bufferStart,
+                        lte: bufferEnd
+                    }
+                }
+            });
+
+            if (conflict) {
+                throw new Error(`Conflict: Table ${effectiveTableId} is occupied by Reservation #${conflict.id} at this time.`);
+            }
+        }
+
         const dataToUpdate: Prisma.ReservationUpdateInput = {};
 
         if (data.tableId !== undefined) {
@@ -187,19 +238,13 @@ export async function updateReservation(id: number, data: UpdateReservationData)
         }
 
         return await prisma.reservation.update({
-            where: { id: id },
+            where: { id },
             data: dataToUpdate,
-            include: {
-                dishes: { 
-                    orderBy: { id: 'asc' },
-                    include: { dish: true } 
-                }
-            }
+            include: { dishes: { include: { dish: true } } }
         });
-    }
-    catch(error) {
-        console.error(`Error in updateReservation service for id ${id}:`, error);
-        throw new Error((error as Error).message || 'Database failed to update reservation.');
+    } catch (error) {
+        console.error(`Update Error:`, error);
+        throw new Error((error as Error).message);
     }
 }
 

@@ -30,6 +30,24 @@ export async function handleCreateReservation(req: Request, res: Response) {
     }
 }
 
+export async function handleGetReservation(req: Request, res: Response) {
+    try {
+        const id = Number(req.params.id);
+
+        // Pull the userId directly from the verified token
+        const currentUser = req.user!;
+        const reservation = await getReservationById(id);
+
+        if (reservation.userId !== currentUser.userId && currentUser.role !== 'ADMIN') {
+            return res.status(403).json({ "message": "Access denied" });
+        }
+
+        return res.status(200).json({ "message": "Reservation retrieved", "data": reservation });
+    } catch (error) {
+        return res.status(404).json({ "message": "Not found", "error": (error as Error).message });
+    }
+}
+
 export async function handleGetAllReservations(req: Request, res: Response) {
     try {
         const currentUser = req.user!;
