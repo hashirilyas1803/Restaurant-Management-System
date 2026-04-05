@@ -87,11 +87,15 @@ Protected routes require the `Authorization` header formatted as: `Bearer <token
 
 ---
 
-### 1. Table Reservation & Pre-Order Workflow
-*   **GET** `/api/reservations` - List reservations. Protected (Admin sees all; Customer sees their own).
-*   **POST** `/api/reservations` - Create a reservation. Protected (Customer).
-*   **PUT** `/api/reservations/:id` - Update details/pre-orders. Protected (Owner/Admin).
-*   **DELETE** `/api/reservations/:id` - Cancel reservation. Protected (Owner/Admin).
+**1. Table Reservation & Pre-Order Workflow**
+ * **GET** `/api/reservations` - List reservations (Filtered by Role).
+ * **GET** `/api/reservations/:id` - Detailed view of a specific booking.
+ * **POST** `/api/reservations` - Create a reservation.
+ * **PUT** `/api/reservations/:id` - Update details.
+ * **DELETE** `/api/reservations/:id` - Cancel reservation.
+
+ **Logic Note:** Includes **Table Collision Validation**. The system automatically blocks bookings for the same table within a 2-hour window.
+
 
 **Expected Request Format (POST / PUT):**
 ```json
@@ -126,6 +130,7 @@ Protected routes require the `Authorization` header formatted as: `Bearer <token
 *   **PUT** `/api/orders/:id` - Modify an order. Protected (Owner/Admin, only if PENDING).
 *   **PATCH** `/api/orders/:id/status` - Transition fulfillment status. Protected (Admin only).
 *   **DELETE** `/api/orders/:id` - Cancel order. Protected (Owner/Admin).
+**Logic Note:** Implements **Status Transition Guards**. Orders follow a strict fulfillment lifecycle (PENDING -> PREPARING -> OUT_FOR_DELIVERY -> DELIVERED) and cannot move backward or be edited once preparation begins.
 
 **Expected Request Format (POST):**
 ```json
@@ -160,11 +165,11 @@ Protected routes require the `Authorization` header formatted as: `Bearer <token
 ---
 
 ### 3. Catering & Event Booking Workflow
-*   **GET** `/api/catering` - List all event bookings. Protected (Owner/Admin).
-*   **POST** `/api/catering` - Submit event request. Protected (Customer).
-*   **PUT** `/api/catering/:id` - Update details/guest count. Protected (Owner/Admin).
-*   **PATCH** `/api/catering/:id/status` - Approve/Reject booking. Protected (Admin only).
-*   **DELETE** `/api/catering/:id` - Remove booking. Protected (Owner/Admin).
+*   **GET** `/api/caterings` - List all event bookings. Protected (Owner/Admin).
+*   **POST** `/api/caterings` - Submit event request. Protected (Customer).
+*   **PUT** `/api/caterings/:id` - Update details/guest count. Protected (Owner/Admin).
+*   **PATCH** `/api/caterings/:id/status` - Approve/Reject booking. Protected (Admin only).
+*   **DELETE** `/api/caterings/:id` - Remove booking. Protected (Owner/Admin).
 
 **Expected Request Format (POST):**
 ```json
