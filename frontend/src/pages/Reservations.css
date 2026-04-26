@@ -1,0 +1,565 @@
+.reservations-container {
+    padding-top: 15vh;
+    min-height: 100vh;
+    background: var(--color-bg-primary);
+}
+
+.reservation-nav-header {
+    margin-bottom: 5rem;
+}
+
+.steps-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.step-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    opacity: 0.3;
+    transition: var(--transition);
+}
+
+.step-dot.active {
+    opacity: 1;
+}
+
+.step-dot span {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    background: var(--color-bg-primary);
+}
+
+.step-dot.active span {
+    background: var(--color-accent);
+    color: #000;
+}
+
+.step-dot label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-secondary);
+}
+
+.steps-indicator .line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.05);
+    margin-top: -1.5rem;
+}
+
+.steps-indicator .line.active {
+    background: var(--color-accent);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-header h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.section-header p {
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+}
+
+.back-link {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 auto 1.5rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.back-link:hover {
+    color: #fff;
+}
+
+/* Reservation Form */
+.reservation-form-grid {
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding: 3rem !important;
+}
+
+.input-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.input-field-group label {
+    font-size: 0.8rem;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reservation-input {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    padding: 1.25rem;
+    border-radius: 12px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    outline: none;
+}
+
+.reservation-input:focus {
+    border-color: var(--color-accent);
+}
+
+.reservation-input option {
+    background: #111;
+    color: #fff;
+}
+
+.reservation-submit-btn {
+    background: var(--color-accent);
+    color: #000;
+    border: none;
+    padding: 1.25rem;
+    border-radius: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.reservation-submit-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.reservation-submit-btn.outline {
+    background: none;
+    border: 1px solid var(--glass-border);
+    color: #fff;
+}
+
+/* Table Map */
+.table-map-container {
+    height: 600px;
+    position: relative;
+    overflow: hidden;
+    padding: 0 !important;
+}
+
+.map-legend {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    z-index: 10;
+}
+
+.legend-item {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-secondary);
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.dot.available {
+    background: #44ff44;
+    box-shadow: 0 0 10px rgba(68, 255, 68, 0.3);
+}
+
+.dot.selected {
+    background: #ffd700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.dot.occupied {
+    background: #ff4444;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+.restaurant-floor-plan {
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 70%),
+        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+    position: relative;
+    border-radius: 20px;
+}
+
+.table-node {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    transition: var(--transition);
+    z-index: 5;
+}
+
+.table-node.occupied {
+    cursor: not-allowed;
+}
+
+.table-inner {
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(10, 10, 12, 0.8);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.table-node.available .table-inner {
+    border-color: rgba(68, 255, 68, 0.4);
+    background: rgba(10, 30, 10, 0.6);
+}
+
+.table-node.occupied .table-inner {
+    border-color: rgba(255, 68, 68, 0.5);
+    background: rgba(40, 10, 10, 0.8);
+    opacity: 0.6;
+}
+
+.table-node.selected .table-inner {
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.15);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+    opacity: 1;
+}
+
+.table-id {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #888;
+}
+
+.table-node.selected .table-id {
+    color: var(--color-accent);
+}
+
+.table-status-label {
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+}
+
+.available .table-status-label {
+    background: rgba(68, 255, 68, 0.2);
+    color: #44ff44;
+}
+
+.occupied .table-status-label {
+    background: rgba(255, 68, 68, 0.2);
+    color: #ff4444;
+}
+
+.selected .table-status-label {
+    background: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+}
+
+.table-node.occupied .table-inner {
+    border-color: rgba(255, 68, 68, 0.3);
+    background: rgba(255, 68, 68, 0.05);
+}
+
+.guests-dots {
+    display: flex;
+    gap: 2px;
+}
+
+.guests-dots span {
+    width: 4px;
+    height: 4px;
+    background: #333;
+    border-radius: 50%;
+}
+
+.table-node.selected .guests-dots span {
+    background: var(--color-accent);
+}
+
+.table-tooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #1a1a1c;
+    border: 1px solid var(--glass-border);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.table-node:hover .table-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.table-tooltip strong {
+    color: #fff;
+    font-size: 0.85rem;
+}
+
+.table-tooltip span {
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+}
+
+.selection-summary {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.selection-summary .info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Pre-meal Styles */
+.pre-meal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.pre-meal-card {
+    padding: 0 !important;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.card-image {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    filter: brightness(0.7);
+    transition: var(--transition);
+}
+
+.pre-meal-card:hover .card-image {
+    filter: brightness(1);
+}
+
+.check-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(212, 175, 55, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    backdrop-filter: blur(2px);
+}
+
+.card-info {
+    padding: 1.5rem;
+}
+
+.card-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.card-info .price {
+    color: var(--color-accent);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.qty-ctrl {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.qty-ctrl button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+.add-pre-btn {
+    width: 100%;
+    background: none;
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.action-row {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+}
+
+/* Confirmation */
+.confirm-grid {
+    display: flex;
+    gap: 4rem;
+    padding: 4rem !important;
+}
+
+.confirm-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.confirm-section h3 {
+    font-size: 1.25rem;
+    color: var(--color-accent);
+    margin-bottom: 1rem;
+}
+
+.confirm-section p {
+    color: var(--color-text-secondary);
+}
+
+.confirm-section p strong {
+    color: #fff;
+}
+
+.confirm-separator {
+    width: 1px;
+    background: var(--glass-border);
+}
+
+.pre-order-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.pre-order-list li {
+    display: flex;
+    justify-content: space-between;
+    color: var(--color-text-secondary);
+}
+
+.pre-order-list .total-row {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--glass-border);
+    font-weight: 700;
+    color: #fff;
+}
+
+.final-actions {
+    text-align: center;
+    margin-top: 4rem;
+}
+
+.disclaimer {
+    color: #555;
+    font-size: 0.8rem;
+    margin-bottom: 2rem;
+}
+
+.reservation-submit-btn.final {
+    padding: 1.5rem 5rem;
+}
+
+@media (max-width: 768px) {
+    .confirm-grid {
+        flex-direction: column;
+        padding: 2rem !important;
+    }
+
+    .confirm-separator {
+        display: none;
+    }
+
+    .table-map-container {
+        height: 400px;
+    }
+
+    .floor-label {
+        font-size: 3rem;
+    }
+
+    .steps-indicator {
+        gap: 0.5rem;
+    }
+
+    .step-dot label {
+        display: none;
+    }
+}
