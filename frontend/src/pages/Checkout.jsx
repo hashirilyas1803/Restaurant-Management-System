@@ -78,6 +78,7 @@ const Checkout = () => {
                     items
                 })
             });
+            clearCart();
             setStep(2);
         } catch (err) {
             alert('Failed to place order: ' + err.message);

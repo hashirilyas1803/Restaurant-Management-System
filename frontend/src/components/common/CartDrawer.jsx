@@ -43,20 +43,40 @@ const CartDrawer = ({ isOpen, onClose, cartItems, itemsData, updateQuantity }) =
                         </div>
                     ) : (
                         Object.entries(cartItems).map(([id, qty]) => {
-                            const item = itemsData.find(i => i.id === parseInt(id));
+                            // 1. Force ID to integer to ensure strict comparison works
+                            const itemId = parseInt(id);
+                            const item = itemsData.find(i => i.id === itemId);
+                            
                             if (!item) return null;
+
+                            // 2. Synchronize image property priority with Order.jsx
+                            const displayImage = item.imageUrl || item.image;
+
                             return (
-                                <div key={id} className="cart-item">
-                                    <div className="item-img" style={{ backgroundImage: item.image ? `url(${item.image})` : 'none', backgroundColor: '#111' }}>
-                                        {!item.image && <ShoppingBag size={20} opacity={0.1} />}
+                                <div key={itemId} className="cart-item">
+                                    <div 
+                                        className="item-img" 
+                                        style={{ 
+                                            backgroundImage: displayImage ? `url(${displayImage})` : 'none', 
+                                            backgroundColor: '#111',
+                                            backgroundSize: 'cover',
+                                            backgroundPosition: 'center'
+                                        }}
+                                    >
+                                        {!displayImage && <ShoppingBag size={20} style={{ opacity: 0.1 }} />}
                                     </div>
                                     <div className="item-details">
                                         <h4>{item.name}</h4>
                                         <div className="item-price">${item.price}</div>
                                         <div className="item-controls">
-                                            <button onClick={() => updateQuantity(parseInt(id), qty - 1)}><Plus size={14} style={{ transform: 'rotate(45deg)' }} /></button>
+                                            {/* 3. Use itemId (number) for the updateQuantity function */}
+                                            <button onClick={() => updateQuantity(itemId, qty - 1)}>
+                                                <Plus size={14} style={{ transform: 'rotate(45deg)' }} />
+                                            </button>
                                             <span className="qty-val">{qty}</span>
-                                            <button onClick={() => updateQuantity(parseInt(id), qty + 1)}><Plus size={14} /></button>
+                                            <button onClick={() => updateQuantity(itemId, qty + 1)}>
+                                                <Plus size={14} />
+                                            </button>
                                         </div>
                                     </div>
                                     <div className="item-total-val">${item.price * qty}</div>
