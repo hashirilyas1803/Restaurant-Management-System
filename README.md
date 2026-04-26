@@ -23,4 +23,3 @@ This project is structured as a monorepo to maintain a clean separation between 
 1.  **Table Reservations & Pre-Orders:** Interactive visual floor plan with **2-hour collision validation** and an integrated pre-order menu system.
 2.  **Online Ordering (Delivery/Takeaway):** Multi-step cart and checkout flow with fulfillment type selection and mock payment gateway integration.
 3.  **Catering & Event Planning:** Specialized logic for high-volume bookings featuring a **Price-per-Head calculation engine** and administrative approval pipelines.
-4.  **Admin Suite:** A protected administrative dashboard for real-time status management of orders, events, and menu CRUD operations.
