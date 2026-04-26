@@ -8,7 +8,9 @@ import {
     RegisterData, 
     LoginData, 
     UpdateUserData, 
-    blacklistToken
+    blacklistToken,
+    getAllUsers,
+    updateUserRole
 } from '../services/authService';
 
 export async function handleRegister(req: Request, res: Response) {
@@ -96,6 +98,30 @@ export async function handleGetUserProfile(req: Request, res: Response) {
             "message": "User could not be retrieved!",
             "error": (error as Error).message
         });
+    }
+}
+
+export async function handleGetAllUsers(req: Request, res: Response) {
+    try {
+        const users = await getAllUsers();
+        return res.status(200).json({ message: "Users retrieved successfully", data: users });
+    } catch (error) {
+        return res.status(500).json({ message: "Users retrieval failed", error: (error as Error).message });
+    }
+}
+
+export async function handleUpdateUserRole(req: Request, res: Response) {
+    try {
+        const targetUserId = Number(req.params.id);
+
+        if (req.user?.userId === targetUserId) {
+            return res.status(403).json({ message: "You cannot modify your own administrative privileges." });
+        }
+
+        const updatedUser = await updateUserRole(targetUserId, req.body.role);
+        return res.status(200).json({ message: "User role updated successfully", data: updatedUser });
+    } catch (error) {
+        return res.status(500).json({ message: "Role update failed", error: (error as Error).message });
     }
 }
 

@@ -141,6 +141,41 @@ export async function getUserById(id: number) {
     }
 }
 
+export async function getAllUsers() {
+    try {
+        return await prisma.user.findMany({
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone_number: true,
+                role: true,
+                created_at: true,
+                orders: { select: { id: true, total: true, status: true, datetime: true } },
+                reservations: { select: { id: true, datetime: true, total: true } },
+                caterings: { select: { id: true, eventName: true, total: true, status: true } }
+            }
+        });
+    } catch(error) {
+        console.error("Error fetching all users:", error);
+         throw new Error("Failed to retrieve users.");
+    }
+}
+
+export async function updateUserRole(id: number, role: any) {
+    try {
+        const updatedUser = await prisma.user.update({
+            where: { id: id },
+            data: { role: role },
+            select: { id: true, name: true, role: true }
+        });
+        return updatedUser;
+    } catch(error) {
+        console.error(`Error updating role for id ${id}:`, error);
+        throw new Error("Failed to update user role.");
+    }
+}
+
 export async function updateUser(id: number, data: UpdateUserData) {
     try {
         const dataToUpdate: any = {};

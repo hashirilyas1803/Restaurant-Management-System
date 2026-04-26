@@ -5,11 +5,19 @@ import {
     handleGetUserProfile, 
     handleUpdateUser, 
     handleDeleteUser, 
-    handleLogout
+    handleLogout,
+    handleGetAllUsers,
+    handleUpdateUserRole
 } from '../controllers/authController';
-import { authenticate } from '../middlewares/authMiddleware';
+import { authenticate, requireAdmin } from '../middlewares/authMiddleware';
 
 const router = Router();
+
+// Route to get all users for administration
+router.get('/users', authenticate, requireAdmin, handleGetAllUsers);
+
+// Route to update a user's role 
+router.patch('/users/:id/role', authenticate, requireAdmin, handleUpdateUserRole);
 
 // Route to register a new user
 router.post('/register', handleRegister);

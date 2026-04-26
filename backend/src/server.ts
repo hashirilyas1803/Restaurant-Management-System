@@ -5,6 +5,7 @@ import authRoutes from './routes/authRoutes';
 import orderRoutes from './routes/orderRoutes';
 import cateringRoutes from './routes/cateringRoutes';
 import dishRoutes from './routes/dishRoutes';
+import tableRoutes from './routes/tableRoutes';
 
 // Create the express app
 const app = express();
@@ -20,6 +21,9 @@ app.use('/api/auth', authRoutes);
 
 // Mount the dish routes
 app.use('/api/dishes', dishRoutes);
+
+// Mount the table routes
+app.use('/api/tables', tableRoutes);
 
 // Mount the reservation routes
 app.use('/api/reservations', reservationRoutes);

@@ -93,6 +93,7 @@ model Dish {
   price Float
   cuisine String
   category String @default("Main Course") // e.g., Starters, Mains, Desserts
+  imageUrl String?
   reservations ReservationDish[]
   orders OrderDish[]
   caterings CateringDish[]
