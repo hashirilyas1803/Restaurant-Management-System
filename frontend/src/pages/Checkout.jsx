@@ -37,6 +37,7 @@ const Checkout = () => {
         { id: 9, name: 'Mango Lassi Silk', price: 9 },
     ];
     const [menuData, setMenuData] = useState(INITIAL_MENU_DATA);
+    const [error, setError] = useState(null);
 
     React.useEffect(() => {
         fetchWithAuth('/api/dishes')
@@ -166,33 +167,9 @@ const Checkout = () => {
                             </div>
                         </section>
 
-                        <section className="form-section">
-                            <h3>2. Guest Details</h3>
-                            <div className="input-grid">
-                                <div className="input-group">
-                                    <label>FULL NAME</label>
-                                    <input type="text" name="name" onChange={handleInputChange} required />
-                                </div>
-                                <div className="input-group">
-                                    <label>EMAIL</label>
-                                    <input type="email" name="email" onChange={handleInputChange} required />
-                                </div>
-                                <div className="input-group">
-                                    <label>PHONE</label>
-                                    <input type="tel" name="phone" onChange={handleInputChange} required />
-                                </div>
-                                {orderType === 'delivery' && (
-                                    <div className="input-group full-width">
-                                        <label>DELIVERY ADDRESS</label>
-                                        <input type="text" name="address" onChange={handleInputChange} required />
-                                    </div>
-                                )}
-                            </div>
-                        </section>
-
                         {orderType === 'takeaway' ? (
                             <section className="form-section animate-fade-in">
-                                <h3>3. Select Branch</h3>
+                                <h3>2. Select Branch</h3>
                                 <div className="branch-selector-wrapper">
                                     <MapPin className="branch-icon-left" size={20} />
                                     <select
@@ -213,6 +190,18 @@ const Checkout = () => {
                             </section>
                         ) : (
                             <section className="form-section animate-fade-in">
+                                <section className="form-section">
+                                <h3>2. Location Details</h3>
+                                <div className="input-grid">
+                                    {orderType === 'delivery' && (
+                                        <div className="input-group full-width">
+                                            <label>DELIVERY ADDRESS</label>
+                                            <input type="text" name="address" onChange={handleInputChange} required />
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                            <br/>
                                 <h3>3. Payment Method</h3>
                                 <div className="payment-options">
                                     <label className={`payment-card ${paymentMethod === 'card' ? 'active' : ''}`}>

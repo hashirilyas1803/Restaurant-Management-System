@@ -1,10 +1,15 @@
 import React from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, CalendarDays, ShoppingBag, Users, LogOut, Settings, UserCircle } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, CalendarDays, ShoppingBag, Users, LogOut, UserCircle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import './AdminLayout.css';
 
 const AdminLayout = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const { clearCart } = useCart();
 
     const navItems = [
         { name: 'Dashboard', path: '/admin', icon: <LayoutDashboard size={20} /> },
@@ -12,8 +17,13 @@ const AdminLayout = () => {
         { name: 'Orders', path: '/admin/orders', icon: <ShoppingBag size={20} /> },
         { name: 'Events', path: '/admin/events', icon: <Users size={20} /> },
         { name: 'Users', path: '/admin/users', icon: <UserCircle size={20} /> },
-        { name: 'Settings', path: '/admin/settings', icon: <Settings size={20} /> },
     ];
+
+    const handleLogout = () => {
+        logout();
+        clearCart();
+        navigate('/');
+    };
 
     return (
         <div className="admin-container">
@@ -34,10 +44,20 @@ const AdminLayout = () => {
                     ))}
                 </nav>
                 <div className="sidebar-footer">
-                    <Link to="/" className="sidebar-link">
+                    <button 
+                        onClick={handleLogout} 
+                        className="sidebar-link logout-btn"
+                        style={{ 
+                            background: 'transparent', 
+                            border: 'none', 
+                            width: '100%', 
+                            cursor: 'pointer',
+                            color: 'rgba(255,255,255,0.7)'
+                        }}
+                    >
                         <LogOut size={20} />
-                        <span>Exit</span>
-                    </Link>
+                        <span>Logout ({user?.name || 'Admin'})</span>
+                    </button>
                 </div>
             </aside>
             <main className="admin-content">

@@ -25,12 +25,12 @@ const Login = () => {
                 login(res.data.user, res.data.token);
                 res.data.user.role === 'ADMIN' ? navigate('/admin') : navigate('/');
             } else {
-                await fetchWithAuth('/api/auth/register', {
+                const res = await fetchWithAuth('/api/auth/register', {
                     method: 'POST',
                     body: JSON.stringify({ name, email, password, phone_number: phoneNumber })
                 });
-                alert('Account created! Please sign in.');
-                setMode('login');
+                login(res.data.user, res.data.token);
+                res.data.user.role === 'ADMIN' ? navigate('/admin') : navigate('/');
             }
         } catch (err) {
             setError(err.message);

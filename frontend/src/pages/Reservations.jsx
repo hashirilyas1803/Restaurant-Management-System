@@ -58,6 +58,8 @@ const Reservations = () => {
     });
     const [menuData, setMenuData] = useState(INITIAL_MENU_DATA);
     const [dbTables, setDbTables] = useState([]);
+    const [error, setError] = useState(null);
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     React.useEffect(() => {
         fetchWithAuth('/api/dishes')
@@ -123,6 +125,58 @@ const Reservations = () => {
 
     const isStep1Valid = bookingData.date && bookingData.time && bookingData.guests;
     const isStep2Valid = bookingData.selectedTable;
+
+    // --- SUCCESS STATE ---
+    if (isSubmitted) {
+        return (
+            <div className="min-h-[80vh] flex items-center justify-center px-4 mt-20 animate-fade-in">
+                <div className="glass-card p-10 rounded-2xl shadow-xl border-t-4 border-green-500 max-w-2xl w-full text-center">
+                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Check className="w-10 h-10 text-green-600" />
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-4">Passage Secured</h2>
+                    <p className="text-gray-600 mb-8 text-lg">
+                        Your table has been successfully reserved. A confirmation has been dispatched to your terminal.
+                    </p>
+                    <button 
+                        onClick={() => window.location.href = '/'} 
+                        className="reservation-submit-btn"
+                    >
+                        Return to Sanctuary
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // --- ERROR STATE ---
+    if (error) {
+        return (
+            <div className="min-h-[80vh] flex items-center justify-center px-4 pt-20 animate-fade-in">
+                <div className="glass-card p-10 rounded-2xl shadow-xl border-t-4 border-red-500 max-w-2xl w-full text-center">
+                    <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Search className="w-10 h-10 text-red-600" />
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-4">Reservation Failed</h2>
+                    <p className="text-gray-600 mb-8 text-lg">{error}</p>
+                    <div className="flex gap-4 justify-center">
+                        <button 
+                            onClick={() => setError(null)} 
+                            className="reservation-submit-btn"
+                        >
+                            Try Again
+                        </button>
+                        <button 
+                            onClick={() => window.location.href = '/'} 
+                            className="reservation-submit-btn outline"
+                        >
+                            Return Home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="reservations-container animate-fade-in">
@@ -329,8 +383,6 @@ const Reservations = () => {
                                 className="reservation-submit-btn final"
                                 onClick={async () => {
                                     try {
-                                        // tableId might be a number or string like 'T1' wait we need integer
-                                        // let's just parse the last char
                                         const tId = parseInt(String(bookingData.selectedTable).replace('T', ''));
                                         const preOrders = Object.entries(bookingData.preOrder).map(([id, qty]) => ({
                                             dishId: parseInt(id),
@@ -346,11 +398,14 @@ const Reservations = () => {
                                                 preOrders
                                             })
                                         });
-                                        
-                                        alert('Your Table is Secured!');
-                                        window.location.href = '/';
+
+                                        // Success State
+                                        setIsSubmitted(true);
+                                        window.scrollTo(0, 0); 
                                     } catch (err) {
-                                        alert('Failed to secure table: ' + err.message);
+                                        // Error State: Capture message instead of alerting
+                                        setError(err.message || 'The system is unavailable. Please try later!');
+                                        window.scrollTo(0, 0);
                                     }
                                 }}
                             >
