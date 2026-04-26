@@ -14,7 +14,7 @@ This project is structured as a monorepo to maintain a clean separation between 
 *   **Security:** JWT (JSON Web Tokens), Bcrypt password hashing, Server-side Token Blacklisting.
 *   **Testing:** Jest & Supertest (Integration and Unit testing).
 
-## 👥 Team Members (Group 24)
+## 👥 Team Members (Group 8)
 *   **Muhammad Hashir Ilyas (26972)** - muhammadhashir.ilyas@gmail.com
 *   **Zain Sharjeel (26922)** - zain.sharjil@gmail.com
 *   **Ibrahim Iqbal (27085)** - ibrahimiqbal2002@yahoo.com
