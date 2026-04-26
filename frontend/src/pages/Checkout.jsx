@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, CreditCard, Banknote, Truck, ShoppingBasket, MapPin, ChevronDown } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, CreditCard, Banknote, Truck, ShoppingBasket, MapPin, ChevronDown, Lock } from 'lucide-react';
 import { fetchWithAuth } from '../api';
 import './Checkout.css';
 
@@ -13,17 +13,23 @@ const BRANCHES = [
 ];
 
 const Checkout = () => {
-    const { cartItems, updateQuantity } = useCart();
+    const { cartItems, updateQuantity, clearCart } = useCart(); // Assuming clearCart exists in context
     const navigate = useNavigate();
-    const [step, setStep] = useState(1); // 1: Details, 2: Receipt
+    const [step, setStep] = useState(1);
     const [orderType, setOrderType] = useState('delivery');
     const [paymentMethod, setPaymentMethod] = useState('card');
     const [selectedBranch, setSelectedBranch] = useState(BRANCHES[0]);
+    
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
-        address: ''
+        address: '',
+        // Card Details
+        cardName: '',
+        cardNumber: '',
+        expiry: '',
+        cvv: ''
     });
 
     const INITIAL_MENU_DATA = [
@@ -37,7 +43,6 @@ const Checkout = () => {
         { id: 9, name: 'Mango Lassi Silk', price: 9 },
     ];
     const [menuData, setMenuData] = useState(INITIAL_MENU_DATA);
-    const [error, setError] = useState(null);
 
     React.useEffect(() => {
         fetchWithAuth('/api/dishes')
@@ -69,7 +74,7 @@ const Checkout = () => {
                 body: JSON.stringify({
                     location: orderType === 'delivery' ? formData.address : selectedBranch,
                     type: orderType.toUpperCase(),
-                    paymentMethod: 'ONLINE',
+                    paymentMethod: paymentMethod === 'card' ? 'ONLINE' : 'CASH',
                     items
                 })
             });
@@ -94,9 +99,7 @@ const Checkout = () => {
 
                         <div className="receipt-section">
                             <h4>Customer Details</h4>
-                            <p>{formData.name}</p>
-                            <p>{formData.email}</p>
-                            <p>{formData.phone}</p>
+                            <p>{formData.name || 'Valued Guest'}</p>
                             {orderType === 'delivery' ? (
                                 <p>{formData.address}</p>
                             ) : (
@@ -105,8 +108,10 @@ const Checkout = () => {
                         </div>
 
                         <div className="receipt-section">
-                            <h4>Order Type</h4>
-                            <p style={{ textTransform: 'capitalize' }}>{orderType} • {orderType === 'takeaway' ? 'Payment at Counter' : (paymentMethod === 'card' ? 'Paid via Card' : 'Cash on Delivery')}</p>
+                            <h4>Order Status</h4>
+                            <p style={{ textTransform: 'capitalize' }}>
+                                {orderType} • {paymentMethod === 'card' ? 'Paid via Card' : 'Payment on Delivery/Collection'}
+                            </p>
                         </div>
 
                         <div className="receipt-section">
@@ -189,43 +194,70 @@ const Checkout = () => {
                                 <p className="payment-note">Payment will be handled at the branch counter during collection.</p>
                             </section>
                         ) : (
-                            <section className="form-section animate-fade-in">
-                                <section className="form-section">
-                                <h3>2. Location Details</h3>
-                                <div className="input-grid">
-                                    {orderType === 'delivery' && (
+                            <>
+                                <section className="form-section animate-fade-in">
+                                    <h3>2. Location Details</h3>
+                                    <div className="input-grid">
                                         <div className="input-group full-width">
                                             <label>DELIVERY ADDRESS</label>
-                                            <input type="text" name="address" onChange={handleInputChange} required />
+                                            <input type="text" name="address" placeholder="123 Gourmet St, Suite 400" onChange={handleInputChange} required />
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section className="form-section animate-fade-in">
+                                    <h3>3. Payment Method</h3>
+                                    <div className="payment-options">
+                                        <label className={`payment-card ${paymentMethod === 'card' ? 'active' : ''}`}>
+                                            <input
+                                                type="radio"
+                                                name="payment"
+                                                checked={paymentMethod === 'card'}
+                                                onChange={() => setPaymentMethod('card')}
+                                            />
+                                            <CreditCard size={20} />
+                                            <span>Credit / Debit Card</span>
+                                        </label>
+                                        <label className={`payment-card ${paymentMethod === 'cash' ? 'active' : ''}`}>
+                                            <input
+                                                type="radio"
+                                                name="payment"
+                                                checked={paymentMethod === 'cash'}
+                                                onChange={() => setPaymentMethod('cash')}
+                                            />
+                                            <Banknote size={20} />
+                                            <span>Cash on Delivery</span>
+                                        </label>
+                                    </div>
+
+                                    {/* Credit Card Prompt */}
+                                    {paymentMethod === 'card' && (
+                                        <div className="card-details-prompt animate-fade-up">
+                                            <div className="input-group">
+                                                <label>NAME ON CARD</label>
+                                                <input type="text" name="cardName" placeholder="Full Name" onChange={handleInputChange} required />
+                                            </div>
+                                            <div className="input-group">
+                                                <label>CARD NUMBER</label>
+                                                <div className="secure-input-wrapper">
+                                                    <input type="text" name="cardNumber" placeholder="0000 0000 0000 0000" maxLength="19" onChange={handleInputChange} required />
+                                                    <Lock size={14} className="lock-icon" />
+                                                </div>
+                                            </div>
+                                            <div className="input-grid">
+                                                <div className="input-group">
+                                                    <label>EXPIRY</label>
+                                                    <input type="text" name="expiry" placeholder="MM/YY" maxLength="5" onChange={handleInputChange} required />
+                                                </div>
+                                                <div className="input-group">
+                                                    <label>CVV</label>
+                                                    <input type="password" name="cvv" placeholder="***" maxLength="3" onChange={handleInputChange} required />
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
-                                </div>
-                            </section>
-                            <br/>
-                                <h3>3. Payment Method</h3>
-                                <div className="payment-options">
-                                    <label className={`payment-card ${paymentMethod === 'card' ? 'active' : ''}`}>
-                                        <input
-                                            type="radio"
-                                            name="payment"
-                                            checked={paymentMethod === 'card'}
-                                            onChange={() => setPaymentMethod('card')}
-                                        />
-                                        <CreditCard size={20} />
-                                        <span>Credit / Debit Card</span>
-                                    </label>
-                                    <label className={`payment-card ${paymentMethod === 'cash' ? 'active' : ''}`}>
-                                        <input
-                                            type="radio"
-                                            name="payment"
-                                            checked={paymentMethod === 'cash'}
-                                            onChange={() => setPaymentMethod('cash')}
-                                        />
-                                        <Banknote size={20} />
-                                        <span>Cash on Delivery</span>
-                                    </label>
-                                </div>
-                            </section>
+                                </section>
+                            </>
                         )}
 
                         <button type="submit" className="confirm-order-btn">
@@ -234,6 +266,7 @@ const Checkout = () => {
                     </form>
                 </div>
 
+                {/* Summary side remains the same */}
                 <div className="checkout-summary-side">
                     <div className="summary-card glass-panel">
                         <h3>Order Summary</h3>
@@ -269,6 +302,39 @@ const Checkout = () => {
                     </div>
                 </div>
             </div>
+
+            <style>{`
+                .card-details-prompt {
+                    background: rgba(255, 255, 255, 0.03);
+                    padding: 1.5rem;
+                    border-radius: 12px;
+                    margin-top: 1.5rem;
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+                .secure-input-wrapper {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                }
+                .secure-input-wrapper input {
+                    width: 100%;
+                }
+                .lock-icon {
+                    position: absolute;
+                    right: 1rem;
+                    opacity: 0.4;
+                }
+                .animate-fade-up {
+                    animation: fadeUp 0.4s ease-out;
+                }
+                @keyframes fadeUp {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
         </div>
     );
 };
