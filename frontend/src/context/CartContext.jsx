@@ -5,7 +5,8 @@ const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState({}); // { itemId: qty }
+    // { itemId: qty }
+    const [cartItems, setCartItems] = useState({});
     const [isCartOpen, setIsCartOpen] = useState(false);
 
     const openCart = () => setIsCartOpen(true);
@@ -13,7 +14,8 @@ export const CartProvider = ({ children }) => {
 
     const addToCart = (id) => {
         setCartItems(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
-        setIsCartOpen(true); // Auto open for feedback
+        // Auto open for feedback
+        setIsCartOpen(true);
     };
 
     const removeFromCart = (id) => {

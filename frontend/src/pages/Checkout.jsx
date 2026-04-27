@@ -13,7 +13,7 @@ const BRANCHES = [
 ];
 
 const Checkout = () => {
-    const { cartItems, updateQuantity, clearCart } = useCart(); // Assuming clearCart exists in context
+    const { cartItems, updateQuantity, clearCart } = useCart();
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [orderType, setOrderType] = useState('delivery');
