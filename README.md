@@ -19,6 +19,12 @@ This project is structured as a monorepo to maintain a clean separation between 
 *   **Zain Sharjeel (26922)** - zain.sharjil@gmail.com
 *   **Ibrahim Iqbal (27085)** - ibrahimiqbal2002@yahoo.com
 
+## 🤝 Team Contributions
+The project was developed collaboratively with a focus on modular ownership:
+*   **Muhammad Hashir Ilyas(Group Lead):** Responsible for the implementation of the **Table Reservations Workflow**. Handled the database schema design, documentation and API design.
+*   **Zain Sharjeel(UI/UX Lead):** Responsible for the implementation of the **Online Ordering Workflow**. Provided the main UI design and theme. Helped with testing.
+*   **Ibrahim Iqbal:** Implemented the **Catering & Event Planning Workflow**. Helped with ensuring smooth integration of the frontend and backend.
+
 ## ✅ Core Workflows Implemented
 1.  **Table Reservations & Pre-Orders:** Interactive visual floor plan with **2-hour collision validation** and an integrated pre-order menu system.
 2.  **Online Ordering (Delivery/Takeaway):** Multi-step cart and checkout flow with fulfillment type selection and mock payment gateway integration.

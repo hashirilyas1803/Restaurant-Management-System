@@ -24,6 +24,7 @@ const Navbar = () => {
         { name: 'Reservations', path: '/reservations' },
         { name: 'Menu', path: '/order' },
         { name: 'Events', path: '/events' },
+        { name: 'History', path: '/history' },
     ];
 
     return (

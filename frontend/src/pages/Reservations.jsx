@@ -133,21 +133,37 @@ const Reservations = () => {
     const isStep1Valid = bookingData.date && bookingData.time && bookingData.guests;
     const isStep2Valid = bookingData.selectedTable;
 
-    // --- SUCCESS STATE ---
+    // --- SUCCESS STATE (Centered Modal) ---
     if (isSubmitted) {
         return (
-            <div className="min-h-[80vh] flex items-center justify-center px-4 mt-20 animate-fade-in">
-                <div className="glass-card p-10 rounded-2xl shadow-xl border-t-4 border-green-500 max-w-2xl w-full text-center">
-                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Check className="w-10 h-10 text-green-600" />
+            <div style={{
+                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(10px)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                zIndex: 9999, padding: '20px'
+            }}>
+                <div className="glass-card" style={{ 
+                    maxWidth: '550px', width: '100%', padding: '3.5rem', textAlign: 'center',
+                    border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px',
+                    borderTop: '4px solid #22c55e' // Green accent top
+                }}>
+                    <div style={{ 
+                        width: '72px', height: '72px', backgroundColor: 'rgba(34, 197, 94, 0.1)', 
+                        borderRadius: '50%', display: 'flex', alignItems: 'center', 
+                        justifyContent: 'center', margin: '0 auto 1.5rem' 
+                    }}>
+                        <Check style={{ color: '#22c55e' }} size={36} />
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">Passage Secured</h2>
-                    <p className="text-gray-600 mb-8 text-lg">
+                    <h2 style={{ fontSize: '2.25rem', fontWeight: 'bold', color: 'white', marginBottom: '1rem' }}>
+                        Passage Secured
+                    </h2>
+                    <p style={{ color: '#9ca3af', marginBottom: '2.5rem', fontSize: '1.15rem', lineHeight: '1.6' }}>
                         Your table has been successfully reserved. A confirmation has been dispatched to your terminal.
                     </p>
                     <button 
                         onClick={() => window.location.href = '/'} 
                         className="reservation-submit-btn"
+                        style={{ width: '100%', padding: '1rem' }}
                     >
                         Return to Sanctuary
                     </button>
@@ -156,28 +172,53 @@ const Reservations = () => {
         );
     }
 
-    // --- ERROR STATE ---
+    // --- ERROR STATE (Centered Modal) ---
     if (error) {
         return (
-            <div className="min-h-[80vh] flex items-center justify-center px-4 pt-20 animate-fade-in">
-                <div className="glass-card p-10 rounded-2xl shadow-xl border-t-4 border-red-500 max-w-2xl w-full text-center">
-                    <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Search className="w-10 h-10 text-red-600" />
+            <div style={{
+                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(10px)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                zIndex: 10000, padding: '20px'
+            }}>
+                <div className="glass-card" style={{ 
+                    maxWidth: '550px', width: '100%', padding: '3.5rem', textAlign: 'center',
+                    border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px',
+                    borderTop: '4px solid #ef4444' // Red accent top
+                }}>
+                    <div style={{ 
+                        width: '72px', height: '72px', backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+                        borderRadius: '50%', display: 'flex', alignItems: 'center', 
+                        justifyContent: 'center', margin: '0 auto 1.5rem' 
+                    }}>
+                        <Search style={{ color: '#ef4444' }} size={36} />
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">Reservation Failed</h2>
-                    <p className="text-gray-600 mb-8 text-lg">{error}</p>
-                    <div className="flex gap-4 justify-center">
+                    <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'white', marginBottom: '1rem' }}>
+                        Reservation Conflict
+                    </h2>
+                    <p style={{ color: '#9ca3af', marginBottom: '2.5rem', fontSize: '1.1rem' }}>
+                        {error}
+                    </p>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
                         <button 
                             onClick={() => setError(null)} 
                             className="reservation-submit-btn"
+                            style={{ flex: 1, padding: '1rem' }}
                         >
                             Try Again
                         </button>
                         <button 
                             onClick={() => window.location.href = '/'} 
-                            className="reservation-submit-btn outline"
+                            className="reservation-submit-btn"
+                            style={{ 
+                                flex: 1, 
+                                background: 'transparent', 
+                                border: '1px solid rgba(255,255,255,0.2)', 
+                                color: 'white',
+                                padding: '1rem' 
+                            }}
                         >
-                            Return Home
+                            Cancel
                         </button>
                     </div>
                 </div>
