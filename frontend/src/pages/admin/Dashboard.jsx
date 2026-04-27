@@ -31,11 +31,12 @@ const Dashboard = () => {
             <h1 style={{ marginBottom: '2rem' }}>Dashboard Overview</h1>
 
             {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-                <StatCard title="Total Revenue" value={`$${totalRevenue.toFixed(2)}`} icon={<DollarSign size={24} />} trend="Recent" />
-                <StatCard title="Active Orders" value={activeOrders} icon={<ChefHat size={24} />} trend="Recent" />
-                <StatCard title="Reservations" value={reservations.length} icon={<TrendingUp size={24} />} trend="Recent" />
-                <StatCard title="Total Customers" value={users.length || "--"} icon={<Users size={24} />} trend="Recent" />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(222px, 1fr))', gap: '0.5rem', marginBottom: '3rem' }}>
+                <StatCard title="Total Revenue" value={`$${totalRevenue.toFixed(2)}`} icon={<DollarSign size={21} />} trend="Recent" />
+                <StatCard title="Active Orders" value={activeOrders} icon={<ChefHat size={21} />} trend="Recent" />
+                <StatCard title="Reservations" value={reservations.length} icon={<TrendingUp size={21} />} trend="Recent" />
+                <StatCard title="Total Customers" value={users.filter(user => user.role === 'CUSTOMER').length || "--"} icon={<Users size={21} />} trend="Recent" />
+                <StatCard title="Total Users" value={users.length || "--"} icon={<Users size={21} />} trend="Recent" />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>

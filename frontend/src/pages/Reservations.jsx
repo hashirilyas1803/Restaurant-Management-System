@@ -97,6 +97,13 @@ const Reservations = () => {
 
     const handleNext = () => setStep(step + 1);
     const handleBack = () => setStep(step - 1);
+    const handleSkip = () => {
+        setBookingData(prev => ({
+            ...prev,
+            preOrder: {}
+        }));
+        handleNext();
+    };
 
     const togglePreOrder = (itemId) => {
         setBookingData(prev => {
@@ -334,7 +341,7 @@ const Reservations = () => {
                             ))}
                         </div>
                         <div className="action-row">
-                            <button className="reservation-submit-btn outline" onClick={handleNext}>Skip Pre-Order</button>
+                            <button className="reservation-submit-btn outline" onClick={handleSkip}>Skip Pre-Order</button>
                             <button className="reservation-submit-btn" onClick={handleNext}>Finalize Reservation</button>
                         </div>
                     </div>
@@ -343,6 +350,7 @@ const Reservations = () => {
                 {step === 4 && (
                     <div className="confirmation-final fade-in">
                         <div className="section-header">
+                            <button className="back-link" onClick={handleBack}><ChevronLeft size={16} /> Previous Step</button>
                             <h1>Review Your Passage</h1>
                         </div>
                         <div className="confirm-grid glass-card">

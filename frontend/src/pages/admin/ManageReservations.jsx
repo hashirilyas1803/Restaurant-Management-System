@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../../components/common/Card';
 import { fetchWithAuth } from '../../api';
+import { X, Trash2 } from 'lucide-react'; 
 
 const ManageReservations = () => {
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedReservation, setSelectedReservation] = useState(null);
+    const [deleteId, setDeleteId] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [error, setError] = useState(null);
 
     const loadReservations = () => {
         setLoading(true);
@@ -54,7 +58,7 @@ const ManageReservations = () => {
                                             {new Date(res.datetime).toLocaleDateString()} at{' '}
                                             {new Date(res.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </td>
-                                        <td style={{ padding: '1rem' }}>Table {res.tableId}</td>
+                                        <td style={{ padding: '1rem' }}>Table {res.table.id}</td>
                                         <td style={{ padding: '1rem' }}>
                                             {/* Depending on backend relation structure, res.user might be populated */}
                                             {res.user ? `${res.user.name} (${res.user.email})` : `User ID: ${res.userId}`}
@@ -62,13 +66,7 @@ const ManageReservations = () => {
                                         <td style={{ padding: '1rem' }}>${(res.total || 0).toFixed(2)}</td>
                                         <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                             <button 
-                                                onClick={() => {
-                                                    if(window.confirm('Are you sure you want to cancel this reservation?')) {
-                                                        fetchWithAuth(`/api/reservations/${res.id}`, { method: 'DELETE' })
-                                                            .then(() => loadReservations())
-                                                            .catch(err => alert('Failed to cancel: ' + err.message));
-                                                    }
-                                                }}
+                                                onClick={() => setDeleteId(res.id)}
                                                 style={{
                                                     background: 'rgba(244, 67, 54, 0.2)',
                                                     border: 'none',
@@ -127,6 +125,115 @@ const ManageReservations = () => {
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem' }}>
                             <button onClick={() => setSelectedReservation(null)} style={{ background: 'var(--color-accent)', color: '#000', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Close</button>
                         </div>
+                    </div>
+                </div>
+            )}
+            {/* --- THE MODAL (Guaranteed Centering) --- */}
+            {deleteId && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 9999,
+                    padding: '20px'
+                }}>
+                    <div className="glass-panel" style={{ 
+                        maxWidth: '400px', 
+                        width: '100%', 
+                        padding: '3rem', 
+                        textAlign: 'center',
+                        border: '1px solid rgba(255,255,255,0.1)'
+                    }}>
+                        {/* Trash Icon */}
+                        <div style={{ 
+                            width: '64px', height: '64px', backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+                            borderRadius: '50%', display: 'flex', alignItems: 'center', 
+                            justifyContent: 'center', margin: '0 auto 1.5rem' 
+                        }}>
+                            <Trash2 style={{ color: '#ef4444' }} size={32} />
+                        </div>
+
+                        <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: 'white', marginBottom: '0.5rem' }}>
+                            Cancel Reservation?
+                        </h2>
+                        <p style={{ color: '#9ca3af', marginBottom: '2rem', fontSize: '1.1rem' }}>
+                            This time slot will be released. This action cannot be undone.
+                        </p>
+
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button 
+                                onClick={async () => {
+                                    setIsDeleting(true);
+                                    try {
+                                        await fetchWithAuth(`/api/reservations/${deleteId}`, { method: 'DELETE' });
+                                        setDeleteId(null);
+                                        loadReservations();
+                                    } catch (err) {
+                                        setError(err.message);
+                                    } finally {
+                                        setIsDeleting(false);
+                                    }
+                                }}
+                                className="reservation-submit-btn"
+                                style={{ flex: 1, padding: '0.75rem' }}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? 'Working...' : 'Yes, Cancel'}
+                            </button>
+                            <button 
+                                onClick={() => setDeleteId(null)}
+                                className="reservation-submit-btn"
+                                style={{ 
+                                    flex: 1, 
+                                    background: 'transparent', 
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    color: 'white',
+                                    padding: '0.75rem'
+                                }}
+                            >
+                                Nevermind
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* --- ERROR MODAL --- */}
+            {error && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10000,
+                    padding: '20px'
+                }}>
+                    <div className="glass-panel" style={{ maxWidth: '400px', width: '100%', padding: '2rem', textAlign: 'center' }}>
+                        <div style={{ width: '64px', height: '64px', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+                            <X style={{ color: '#ef4444' }} size={32} />
+                        </div>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white', marginBottom: '0.5rem' }}>Failed</h2>
+                        <p style={{ color: '#9ca3af', marginBottom: '1.5rem' }}>{error}</p>
+                        <button 
+                            onClick={() => { setError(null); setDeleteId(null); }}
+                            className="reservation-submit-btn"
+                            style={{ width: '100%' }}
+                        >
+                            Dismiss
+                        </button>
                     </div>
                 </div>
             )}
