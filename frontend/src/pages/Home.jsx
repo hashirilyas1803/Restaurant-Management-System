@@ -28,7 +28,7 @@ const Home = () => {
                 Reserve a Table <ArrowRight size={20} />
               </Link>
               <Link to="/order" className="btn-secondary">
-                Place Order
+                Place Order <ArrowRight size={20} />
               </Link>
             </div>
           </div>
@@ -178,8 +178,10 @@ const Home = () => {
           padding: 1.2rem 2.5rem;
           border-radius: 12px;
           text-decoration: none;
-          font-weight: 600;
-          border: 1px solid var(--glass-border);
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
           backdrop-filter: blur(10px);
         }
 
