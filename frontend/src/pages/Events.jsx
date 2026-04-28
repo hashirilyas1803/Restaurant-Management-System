@@ -240,40 +240,13 @@ const Events = () => {
                                 </div>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-                                {/* VENUE OPTION 1 */}
-                                <div 
-                                    className={`event-visual-card ${formData.location === 'Main Sanctuary' ? 'active' : ''}`}
-                                    onClick={() => setFormData({ ...formData, location: 'Main Sanctuary' })}
-                                    style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
-                                >
-                                    <div className="img-container">
-                                        <img src={HeroImage} alt="Venue" />
-                                        <div className="card-overlay"></div>
-                                        {formData.location === 'Main Sanctuary' && (
-                                            <div className="selection-badge">SELECTED</div>
-                                        )}
-                                    </div>
-                                    <div className="card-lbl">
-                                        <h4>Main Sanctuary</h4>
-                                    </div>
+                                <div className="event-visual-card">
+                                    <div className="img-container"><img src={HeroImage} alt="Venue" /><div className="card-overlay"></div></div>
+                                    <div className="card-lbl"><h4>Main Sanctuary</h4></div>
                                 </div>
-
-                                {/* VENUE OPTION 2 */}
-                                <div 
-                                    className={`event-visual-card ${formData.location === 'External Location' ? 'active' : ''}`}
-                                    onClick={() => setFormData({ ...formData, location: 'External Location' })}
-                                    style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
-                                >
-                                    <div className="img-container">
-                                        <img src={CateringImage} alt="Catering" />
-                                        <div className="card-overlay"></div>
-                                        {formData.location === 'External Location' && (
-                                            <div className="selection-badge">SELECTED</div>
-                                        )}
-                                    </div>
-                                    <div className="card-lbl">
-                                        <h4>Gourmet Catering</h4>
-                                    </div>
+                                <div className="event-visual-card">
+                                    <div className="img-container"><img src={CateringImage} alt="Catering" /><div className="card-overlay"></div></div>
+                                    <div className="card-lbl"><h4>Gourmet Catering</h4><span><ShieldCheck size={12} /> Custom Bespoke Menus</span></div>
                                 </div>
                             </div>
                         </div>
@@ -441,37 +414,6 @@ const Events = () => {
 
                 .refined-input::-webkit-calendar-picker-indicator:hover {
                     opacity: 1;
-                }
-
-                .event-visual-card {
-                    border: 2px solid transparent;
-                    border-radius: 16px;
-                    overflow: hidden;
-                }
-
-                /* The Active State */
-                .event-visual-card.active {
-                    border-color: var(--color-accent); /* Your gold/orange color */
-                    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-                    transform: translateY(-5px);
-                }
-
-                .selection-badge {
-                    position: absolute;
-                    top: 1rem;
-                    right: 1rem;
-                    background: var(--color-accent);
-                    color: #000;
-                    padding: 0.4rem 0.8rem;
-                    border-radius: 6px;
-                    font-size: 0.65rem;
-                    font-weight: 800;
-                    z-index: 10;
-                    letter-spacing: 0.1em;
-                }
-
-                .event-visual-card:hover:not(.active) {
-                    border-color: rgba(255, 255, 255, 0.2);
                 }
             `}</style>
         </div>
