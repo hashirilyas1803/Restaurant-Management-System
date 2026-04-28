@@ -4,6 +4,7 @@ import { Clock, CheckCircle, Package, Utensils, Calendar, MapPin, XCircle, Searc
 import './History.css';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import useScrollOnUpdate from '../hooks/useScrollOnUpdate';
 
 const History = () => {
     const { user, isChecking } = useAuth();
@@ -13,6 +14,7 @@ const History = () => {
     const [reservations, setReservations] = useState([]);
     const [caterings, setCaterings] = useState([]);
     const [loading, setLoading] = useState(true);
+    useScrollOnUpdate(activeTab);
 
     useEffect(() => {
         if (isChecking) return;

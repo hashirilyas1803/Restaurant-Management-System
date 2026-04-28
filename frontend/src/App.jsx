@@ -14,6 +14,7 @@ import ManageReservations from './pages/admin/ManageReservations';
 import ManageOrders from './pages/admin/ManageOrders';
 import ManageEvents from './pages/admin/ManageEvents';
 import ManageUsers from './pages/admin/ManageUsers';
+import ScrollToTop from './components/common/ScrollToTop';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 
@@ -30,6 +31,7 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             {/* Customer Routes */}
             <Route path="/" element={<RootLayout />}>

@@ -28,7 +28,7 @@ const Home = () => {
                 Reserve a Table <ArrowRight size={20} />
               </Link>
               <Link to="/order" className="btn-secondary">
-                View Gallery Menu
+                VPlace Order
               </Link>
             </div>
           </div>

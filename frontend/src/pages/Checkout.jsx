@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, CreditCard, Banknote, Truck, ShoppingBasket, MapPin, ChevronDown, Lock } from 'lucide-react';
 import { fetchWithAuth } from '../api';
 import './Checkout.css';
+import useScrollOnUpdate from '../hooks/useScrollOnUpdate';
 
 const BRANCHES = [
     "Downtown Sanctuary - 123 Gourmet Ave",
@@ -19,6 +20,7 @@ const Checkout = () => {
     const [orderType, setOrderType] = useState('delivery');
     const [paymentMethod, setPaymentMethod] = useState('card');
     const [selectedBranch, setSelectedBranch] = useState(BRANCHES[0]);
+    useScrollOnUpdate(step);
     
     const [formData, setFormData] = useState({
         name: '',

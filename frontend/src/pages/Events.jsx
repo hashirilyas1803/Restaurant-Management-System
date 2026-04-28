@@ -6,6 +6,7 @@ import {
     MapPin, Check, Plus, Minus, ChevronLeft, Search 
 } from 'lucide-react';
 import { fetchWithAuth } from '../api';
+import useScrollOnUpdate from '../hooks/useScrollOnUpdate';
 
 // Assets
 import HeroImage from '../assets/images/hero_restaurant_ambience_1769975900791.png';
@@ -33,11 +34,19 @@ const Events = () => {
         name: '', 
         email: '', 
         date: '', 
-        guests: 5, 
+        guests: 5,
+        location: 'Main Sanctuary',
         type: 'Corporate Gala & Summit', 
         details: '',
         selectedDishes: {} 
     });
+    useScrollOnUpdate(step);
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Calculate 1.5 years (18 months) in the future
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 18);
+    const maxDateStr = maxDate.toISOString().split('T')[0];
 
     // New states for feedback
     const [error, setError] = useState(null);
@@ -172,8 +181,20 @@ const Events = () => {
                                 <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                                         <div className="input-field-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                            <label style={{ fontSize: '0.7rem', opacity: 0.5, letterSpacing: '0.2em', fontWeight: 700 }}>TARGET DATE</label>
-                                            <input type="date" className="refined-input" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} required />
+                                            <label style={{ fontSize: '0.7rem', opacity: 0.5, letterSpacing: '0.2em', fontWeight: 700 }}>
+                                                TARGET DATE
+                                            </label>
+                                            <input 
+                                                type="date" 
+                                                className="refined-input" 
+                                                value={formData.date} 
+                                                min={todayStr}    // Prevents past bookings
+                                                max={maxDateStr}  // Prevents bookings beyond 1.5 years
+                                                onChange={e => setFormData({...formData, date: e.target.value})} 
+                                                onClick={(e) => e.target.showPicker?.()} 
+                                                required 
+                                                style={{ cursor: 'pointer' }}
+                                            />
                                         </div>
                                         <div className="input-field-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                             <label style={{ fontSize: '0.7rem', opacity: 0.5, letterSpacing: '0.2em', fontWeight: 700 }}>EXPECTED GUESTS</label>
@@ -219,13 +240,40 @@ const Events = () => {
                                 </div>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-                                <div className="event-visual-card">
-                                    <div className="img-container"><img src={HeroImage} alt="Venue" /><div className="card-overlay"></div></div>
-                                    <div className="card-lbl"><h4>Main Sanctuary</h4><span><MapPin size={12} /> Capacity: 120 Guests</span></div>
+                                {/* VENUE OPTION 1 */}
+                                <div 
+                                    className={`event-visual-card ${formData.location === 'Main Sanctuary' ? 'active' : ''}`}
+                                    onClick={() => setFormData({ ...formData, location: 'Main Sanctuary' })}
+                                    style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
+                                >
+                                    <div className="img-container">
+                                        <img src={HeroImage} alt="Venue" />
+                                        <div className="card-overlay"></div>
+                                        {formData.location === 'Main Sanctuary' && (
+                                            <div className="selection-badge">SELECTED</div>
+                                        )}
+                                    </div>
+                                    <div className="card-lbl">
+                                        <h4>Main Sanctuary</h4>
+                                    </div>
                                 </div>
-                                <div className="event-visual-card">
-                                    <div className="img-container"><img src={CateringImage} alt="Catering" /><div className="card-overlay"></div></div>
-                                    <div className="card-lbl"><h4>Gourmet Catering</h4><span><ShieldCheck size={12} /> Custom Bespoke Menus</span></div>
+
+                                {/* VENUE OPTION 2 */}
+                                <div 
+                                    className={`event-visual-card ${formData.location === 'External Location' ? 'active' : ''}`}
+                                    onClick={() => setFormData({ ...formData, location: 'External Location' })}
+                                    style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
+                                >
+                                    <div className="img-container">
+                                        <img src={CateringImage} alt="Catering" />
+                                        <div className="card-overlay"></div>
+                                        {formData.location === 'External Location' && (
+                                            <div className="selection-badge">SELECTED</div>
+                                        )}
+                                    </div>
+                                    <div className="card-lbl">
+                                        <h4>Gourmet Catering</h4>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -383,6 +431,47 @@ const Events = () => {
                     .menu-selection-grid { grid-template-columns: 1fr; }
                     .action-row { flex-direction: column; }
                     header h1 { font-size: 3rem !important; }
+                }
+                /* Invert the calendar icon for the refined-input class */
+                .refined-input::-webkit-calendar-picker-indicator {
+                    filter: invert(1);
+                    cursor: pointer;
+                    opacity: 0.7;
+                }
+
+                .refined-input::-webkit-calendar-picker-indicator:hover {
+                    opacity: 1;
+                }
+
+                .event-visual-card {
+                    border: 2px solid transparent;
+                    border-radius: 16px;
+                    overflow: hidden;
+                }
+
+                /* The Active State */
+                .event-visual-card.active {
+                    border-color: var(--color-accent); /* Your gold/orange color */
+                    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+                    transform: translateY(-5px);
+                }
+
+                .selection-badge {
+                    position: absolute;
+                    top: 1rem;
+                    right: 1rem;
+                    background: var(--color-accent);
+                    color: #000;
+                    padding: 0.4rem 0.8rem;
+                    border-radius: 6px;
+                    font-size: 0.65rem;
+                    font-weight: 800;
+                    z-index: 10;
+                    letter-spacing: 0.1em;
+                }
+
+                .event-visual-card:hover:not(.active) {
+                    border-color: rgba(255, 255, 255, 0.2);
                 }
             `}</style>
         </div>

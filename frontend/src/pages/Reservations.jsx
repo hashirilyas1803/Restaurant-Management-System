@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShoppingBag, Plus, Minus, Search, Check, Utensils, Calendar, Users, Clock, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchWithAuth } from '../api';
 import './Reservations.css';
+import useScrollOnUpdate from '../hooks/useScrollOnUpdate';
 
 // Menu items for pre-ordering
 import BurgerImage from '../assets/images/gourmet_burger_plate_1769975915068.png';
@@ -60,6 +61,14 @@ const Reservations = () => {
     const [dbTables, setDbTables] = useState([]);
     const [error, setError] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    useScrollOnUpdate(step); 
+
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Limit bookings to 3 months in advance
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 3);
+    const maxDateStr = maxDate.toISOString().split('T')[0];
 
     React.useEffect(() => {
         fetchWithAuth('/api/dishes')
@@ -250,13 +259,17 @@ const Reservations = () => {
                             <p>Choose the date and time for your dining experience.</p>
                         </div>
                         <div className="reservation-form-grid glass-card">
-                            <div className="input-field-group">
+                           <div className="input-field-group">
                                 <label><Calendar size={16} /> Date</label>
                                 <input
                                     type="date"
-                                    className="reservation-input"
+                                    className="reservation-input clickable-date"
                                     value={bookingData.date}
+                                    min={today} // Prevents past dates
+                                    max={maxDateStr} // Prevents dates too far in the future
                                     onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
+                                    // Triggers the picker when the input is clicked anywhere
+                                    onClick={(e) => e.target.showPicker?.()} 
                                 />
                             </div>
                             <div className="input-field-group">

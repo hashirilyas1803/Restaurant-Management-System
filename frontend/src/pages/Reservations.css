@@ -563,3 +563,27 @@
         display: none;
     }
 }
+
+/* Ensure the entire field feels like a button */
+.clickable-date {
+    cursor: pointer;
+    position: relative;
+}
+
+/* Fix for the invisible date icon in dark mode */
+/* This selects the native browser icon and makes it white/visible */
+.reservation-input::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Turns the black icon into white */
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.reservation-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Standardizing the look for Guest input while we're at it */
+.reservation-input[type="number"] {
+    appearance: textfield;
+}
